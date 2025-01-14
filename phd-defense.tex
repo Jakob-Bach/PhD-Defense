@@ -45,15 +45,69 @@
 
 \section{Introduction}
 
-\begin{frame}[t]{Motivation}
+\begin{frame}[t]{Background and Motivation}
+	\begin{definition}[Feature selection]
+		Given a dataset $X \in \mathbb{R}^{m \times n}$
+		and a prediction target $y \in Y^m$ (e.g., $Y = \mathbb{R}$ or $Y = \{0, 1\}$),
+		make a feature-selection decision $s \in \{0,1\}^n$
+		to optimize the feature-set quality $Q(s,X,y)$.
+		Typically, select a fixed number of features~$k \in \mathbb{N}$, i.e., $\sum_{j=1}^n s_j = k$.
+	\end{definition}
+	%JB: want to clarify which scenario we talk about
+	%JB: very generally, we are in field of data science / machine learning
+	%JB: focus on supervised feature selection for tabular data
+	%JB: examples for prediction target from our experiments (though our methods are domain-independent): is person credit-worthy? is e-mail spam? is mushroom poisonous? will horse survive illness?
+	%JB: feature engineering already done (e.g., in spam example)
+	%JB: different white-box and black-box objectives for quality, depending on feature-selection method (from correlating each feature with the target to running a genetic algorithm wrapped around a prediction model)
+	\pause
+	\vspace{\baselineskip}
 	\begin{itemize}
-		\item
+		\item Reasons for feature selection~\cite{chandrashekar2014survey, li2017feature}:
+		\begin{itemize}
+			\item Reduce computational requirements (CPU, memory, storage) of machine learning
+			%JB: training and prediction
+			\item Improve prediction performance
+			% JB: IMHO questionable
+			\item Increase interpretability of predictions
+		\end{itemize}
+		\pause
+		\vspace{\baselineskip}
+		\item Main limitations of most existing feature-selection methods:
+		\begin{itemize}
+			\item Do not consider domain knowledge
+			%JB: Q() is a technical criterion, and there are typically no constraints apart from cardinality
+			%JB: technically good feature sets may still be hard to interpret if they don't make sense from domain perspective
+			%JB: domain knowledge may be firm, hypotheses, preferences
+			%JB: in literature, there are at most approaches integrating specific constraint types into specific FS methods (apart from the work of Groves)
+			\item Return only one feature set, no alternatives
+			%JB: may be misleading if there are alternative solutions with similar quality
+		\end{itemize}
 	\end{itemize}
 \end{frame}
 
-\begin{frame}[t]{Related Work}
+\begin{frame}[t]{Approach}
 	\begin{itemize}
-		\item
+		\item Central idea of dissertation: Make feature selection more user-centric via constraints
+		%JB: we use constraints in propositional logic and linear arithmetic
+		\begin{itemize}
+			\item Still optimize feature-set quality but restrict valid feature selections
+			\item Formulate as white-box optimization problem and use (MIP/SMT) solver
+		\end{itemize}
+		\pause
+		%
+		\begin{example}[A feature-selection constraint in propositional logic]
+			$(\lnot s_1 \land \lnot s_2 \land \lnot s_3) \lor (s_1 \land s_2 \land s_3) \leftrightarrow$ ``Select none or all of Features 1, 2, and 3.''
+		\end{example}
+		%
+		\pause
+		\vspace{0.5\baselineskip}
+		\item Benefits of our approach:
+		\begin{itemize}
+			\item Declarative
+			\item Allows combining constraints
+			\item Orthogonal to choice of feature-selection method
+			%JB: related work typically integrates one constraint type into one feature-selection method
+		\end{itemize}
 	\end{itemize}
 \end{frame}
 
@@ -142,6 +196,12 @@
 			\item \fullcite{bach2024using}
 			\item \fullcite{bach2025subgroup}
 		\end{itemize}
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[t]{Related Work}
+	\begin{itemize}
+		\item
 	\end{itemize}
 \end{frame}
 
