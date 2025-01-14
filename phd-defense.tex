@@ -29,7 +29,7 @@
 
 \addbibresource{references.bib}
 
-\hypersetup{colorlinks=true, citecolor=kit-blue, urlcolor=kit-blue}
+\hypersetup{colorlinks=true, citecolor=kit-blue, linkcolor=kit-blue, urlcolor=kit-blue}
 
 \setlength{\leftmargini}{0.2cm} % change default indentation (so items are left-aligned to boxes)
 \setlength{\leftmarginii}{0.3cm} % 2nd level indentation
@@ -58,8 +58,30 @@
 \end{frame}
 
 \begin{frame}[t]{Contributions}
+	\label{slide:contributions}
 	\begin{itemize}
-		\item
+		\item Four core contributions of our dissertation:
+		%JB: correspond to four chapters in main part
+		\begin{itemize}
+			\item (C1) Evaluating the impact of constraints \cite{bach2022empirical}
+			\item (C2) Using constraints to formulate scientific hypotheses \cite{bach2022empirical}
+			\item (C3) Using constraints for alternative feature sets \cite{bach2023finding, bach2024alternative}
+			\item (C4) Using constraints for feature selection in subgroup discovery \cite{bach2025subgroup, bach2024using}
+		\end{itemize}
+		\item Sub-contributions like formalization, (complexity) analyses, and experimental studies
+		%JB: presentation will focus on (C3) and (C4)
+		\pause
+		\vspace{\baselineskip}
+		%JB: Meta-contibution:
+		\item Reproducibility:
+		\begin{itemize}
+			\item All experimental data available on \href{https://doi.org/10.35097/4kjyeg0z2bxmr6eh}{RADAR4KIT}
+			\item All code available:
+			\begin{itemize}
+				\item Three GitHub repositories [\href{https://github.com/Jakob-Bach/Constrained-Filter-Feature-Selection}{a}, \href{https://github.com/Jakob-Bach/Alternative-Feature-Selection}{b}, \href{https://github.com/Jakob-Bach/Constrained-Subgroup-Discovery}{c}]
+				\item Three Python packages on PyPI: \href{https://pypi.org/project/alfese/}{\texttt{alfese}}, \href{https://pypi.org/project/cffs/}{\texttt{cffs}}, and \href{https://pypi.org/project/csd/}{\texttt{csd}}
+			\end{itemize}
+		\end{itemize}
 	\end{itemize}
 \end{frame}
 
@@ -103,6 +125,25 @@
 \end{frame}
 
 \section{Appendix}
+
+\begin{frame}[t]{Details of Underlying Publications}
+	\begin{itemize}
+		\item Constrained feature selection (\hyperlink{slide:contributions}{C1} and \hyperlink{slide:contributions}{C2}):
+		\begin{itemize}
+			\item \fullcite{bach2022empirical}
+		\end{itemize}
+		\item Alternative feature selection (\hyperlink{slide:contributions}{C3}):
+		\begin{itemize}
+			\item \fullcite{bach2023finding}
+			\item \fullcite{bach2024alternative}
+		\end{itemize}
+		\item Constrained subgroup discovery (\hyperlink{slide:contributions}{C4}):
+		\begin{itemize}
+			\item \fullcite{bach2024using}
+			\item \fullcite{bach2025subgroup}
+		\end{itemize}
+	\end{itemize}
+\end{frame}
 
 \backupend
 
