@@ -175,6 +175,7 @@
 \beginbackup % subsequent slides do not impact overall slide count
 
 \begin{frame}[t, allowframebreaks]{References}
+	\renewcommand*{\bibfont}{\small} % use a smaller font for bib than for main text
 	\printbibliography
 \end{frame}
 
@@ -200,8 +201,40 @@
 \end{frame}
 
 \begin{frame}[t]{Related Work}
+	%JB: only small selection of related work discussed in dissertation
 	\begin{itemize}
-		\item
+		\item Integrating domain knowledge and constraints:
+		\begin{itemize}
+			\item Feature selection: Typically only combination of one constraint type (like cost~\cite{paclik2002feature, plasberg2009feature}, cardinality~\cite{khushaba2011feature, yang2015budget}, or group~\cite{jacob2009group, yuan2006model}) and feature-selection method; exceptions (wrapper methods with black-box constraints):~\cite{groves2015toward, neutatz2021enforcing}
+			%JB: Groves (2015) ignores invalid feature sets in four wrapper FS methods (no white-box solver), uses narrow set of constraint types (related to hierarchical feature grouping and temporal lags)
+			%JB: Neutatz (2021) works with black-box constraints that mostly relate to whole ML system (acuuracy, fairness, training time, etc.) rather than feature selection per se (except number of selected features) and are checked after training/evaluation
+			%JB: other notions of "constrained feature selection" include semi-supervised learning (constraints related to data objects) and Bayesian network learning (conditional independence constraints, learned and propagated automatically)
+			\item Subgroup discovery: White-box formulations of different problem definitions~\cite{eckstein2002maximum, louveaux2014combinatorial} and integration of constraints into algorithmic search methods~\cite{atzmueller2005exploiting, meeng2021real}
+			%JB: other white-box formulations use different constraint types, are CP or MIP (but not SMT), and do not compare against heuristics
+			%JB: Maximum Box Problem (Eckstein 2002): capture as many positives as possible but no negatives
+			%JB: Box Search Problem (Louveaux 2014): optimize sum of target variable of subgroup members (where target is continuous and can be negative)
+			%JB: some SD methods use automatic quality-based pruning during search, but that approach differs from user constraints
+			%JB: typical constraint types according to Meeng (2021): LB on quality, LB on members, UB on search depth
+			%JB: studies on feature-cardinality constraint typically limited to one SD method or one cardinality threshold
+			\item Other fields: E.g., AutoML~\cite{neutatz2023automl}, clustering~\cite{dao2024review}, pattern mining~\cite{silva2016constrained}, XAI~\cite{deutch2019constraints}; outside ML: software engineering~\cite{galindo2019automated}
+			%JB: in ML, different problem definitions; software engineering has technically same problem as we (depending on objective function) but different domain/interpretation; technically, they often combine algorithm with sat solving, but pure white-box approach exist as well
+		\end{itemize}
+		\vspace{\baselineskip}
+		\item Finding alternative solutions:
+		\begin{itemize}
+			\item Feature selection: Approaches that offer less user control over alternatives, e.g., ensemble feature selection~\cite{guru2018alternative, shekar2017diverse} or statistically equivalent feature sets~\cite{borboudakis2021extending, lagani2017feature}
+			%JB: generally, less user control: in particular, no dissimilarity threshold
+			%JB: ensemble feature selection: diversity may be sub-goal, but should "only" increase prediction performance in end (composition of feature sets is not of interest per se)
+			%JB: statistically equivalent feature sets: no control over number, no redundancy at all, statistically equivalent for predictions, while we allow degradation of prediction performance and feature-set overlap (more flexible)
+			\item Subgroup discovery: Subgroup-set selection~\cite{lucas2018ssdp+, proencca2022robust}; different problem definitions of alternative descriptions, e.g., description-based subgroup selection~\cite{leeuwen2012diverse} or equivalent subgroup descriptions of minimal length~\cite{boley2009non}
+			%JB: subgroup-set selection wants to minimize rather than maximize overlap of data objects, and does not care about feature selection
+			%JB: besides simultaneous search for diverse subgroups, also covering (exclude previously covered data objects), weighting, resampling, and post-processing approaches
+			%JB: Leeuwen (2012) proposes 6 strategies for subgroup diversity, two related to descriptions, both integrated into simultaneous beam search, both offers less control than we do: (1) exclude descriptions with same quality and one condition less; (2) global bound on how often each feature selected in subgroup set
+			%JB: Boley (2009): cover exactly same data objects with subset of given features; two search algorithms (not solver-based); inspired our NP-hardness proof
+			\item Other fields: E.g., clustering~\cite{bailey2014alternative}, number partitioning~\cite{lawrinenko2017identical}, subspace search~\cite{fouche2021efficient}, XAI~\cite{mothilal2020explaining}
+			%JB: problem definitions differ from ours (objective, constraints for alternatives)
+			%JB: XAI example: counterfactuals should have different prediction outcome (rather than similar prediction quality) but similar feature values (rather than different feature selection)
+		\end{itemize}
 	\end{itemize}
 \end{frame}
 
