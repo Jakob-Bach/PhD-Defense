@@ -180,9 +180,8 @@
 \end{frame}
 
 \begin{frame}[t]{(C1) Evaluating the Impacts of Constraints -- Results}
-	\begin{figure}[htb]
+	\begin{figure}
 		\centering
-		\captionsetup{justification=centering}
 		\begin{subfigure}{0.48\textwidth}
 			\centering
 			\includegraphics[width=\textwidth, trim={0 15 0 10}, clip]{plots/syn-selected-vs-objective.pdf}
@@ -210,10 +209,124 @@
 
 \section{Alternative Feature Selection}
 
-\begin{frame}[t]{(C3) Finding Alternative Feature Sets}
+\begin{frame}[t]{(C3) Alternative Feature Selection -- Approach}
+	%JB: study for (C1) evaluated randomly generated constraints
+	%JB: study for (C2) evaluated constraints based on domain knowledge
+	%JB: - for time reasons, we don't discuss details
+	%JB: - insight: Differently composed feature sets can yield similar feature-set quality
 	\begin{itemize}
-		\item
+		\item Idea: Find feature sets optimizing feature-set quality while differing from each other
+		%JB: using a set dissimilarity measure (in our case: Dice dissimilarity)
+		\begin{itemize}
+			\item Domain-independent constraint type
+			\item Orthogonal to choice of feature-selection method
+			%JB: we discuss integration into various methods
+			\item Sequential or simultaneous search
+			\item Number of alternatives~$a \in \mathbb{N}_0$ and feature-set dissimilarity threshold $\tau \in [0,1]$ as user parameters
+		\end{itemize}
 	\end{itemize}
+	\pause
+	\begin{columns}
+		\column[t]{0.35\textwidth}
+		\begin{greenblock}{Sequential-search problem}
+			\vspace{-\baselineskip}
+			\begin{equation*}
+				\begin{aligned}
+					\max_s &\quad Q(s,X,y) \\
+					\text{subject to:} &\quad \forall F' \in \mathbb{F}:~d(F_s,F') \geq \tau
+				\end{aligned}
+				\label{eq:afs:afs-sequential}
+			\end{equation*}
+			%JB: alternatives found one by one, i.e., optimize quality of one feature set
+			%JB: set of feature sets given, new alternative should differ from each
+			%JB: optimization problem solved repeatedly
+		\end{greenblock}
+		\column[t]{0.6\textwidth}
+		\begin{greenblock}{Simultaneous-search problem}
+			\vspace{-\baselineskip}
+			\begin{equation*}
+				\begin{aligned}
+					\max_{s^{(0)}, \dots, s^{(a)}} &\quad \operatorname*{agg}_{l \in \{0, \dots, a\}} Q(s^{(l)},X,y) \\
+					\text{subject to:} &\quad \forall l_1, l_2 \in \{0, \dots, a\},~l_1 \neq l_2:~d(F_{s^{(l_1)}},F_{s^{(l_2)}}) \geq \tau
+				\end{aligned}
+				\label{eq:afs:afs-simultaneous}
+			\end{equation*}
+			%JB: all alternatives found at once
+			%JB: still pairwise dissimilarity enforced
+			%JB: examples for "agg": sum, min (latter balances qualities better)
+		\end{greenblock}
+	\end{columns}
+	\pause
+	\vspace{\baselineskip}
+	\begin{itemize}
+		\item Used dissimilarity measure: $d_{\text{Dice}}(F',F'') = 1 - \frac{2 \cdot |F' \cap F''|}{|F'| + |F''|} = 1 - \frac{\sum_{j=1}^n s'_j \cdot s''_j}{\sum_{j=1}^n s'_j + \sum_{j=1}^n s''_j}$
+		%JB: remember that we use binary selection variables "s_j", which form vector "s" for each feature set
+		%JB: for fixed feature-set sizes, resulting constraint becomes linear
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[t]{(C3) Alternative Feature Selection -- Complexity}
+	\begin{itemize}
+		\item Alternative feature selection is $\mathcal{NP}$-complete if:
+		\begin{itemize}
+			\item Simultaneous search with minimum as aggregation operator $\text{agg}(\cdot)$
+			\item Linear notion of feature-set quality: $Q(s,X,y) = \sum_{j=1}^{n} q_j \cdot s_j$
+			%JB: arguably simplest objective, also used in studies (C1) and (C2)
+			\item No feature-set overlap ($\tau = 1$)
+			\item Complete partitioning (each feature part of exactly one feature set)
+			%JB: all features part of exactly one set
+		\end{itemize}
+		\pause
+		\item Proof: Known as \textsc{Multi-Way Number Partitioning}~\cite{korf2010objective} or \textsc{Multiprocessor Scheduling}~\cite{garey2003computers} \qed
+		%JB: if "k" bounded, problem known as "Balanced Number Partitioning" / "K-Partitioning"
+		%JB: NP-hardness naturally transfers to more general problems
+		\pause
+		\vspace{\baselineskip}
+		\item Further complexity-related contributions and results:
+		\begin{itemize}
+			\item Prove $\mathcal{NP}$-hardness for incomplete partitioning and feature-set overlap
+			%JB: drop two of the four assumptions above
+			%JB: reduction from base case above (no overlap, complete partitioning)
+			\pause
+			\item Prove polynomial runtime for sum-aggregation and sequential search with remaining conditions from above
+			\pause
+			\item Develop two heuristic search methods with approximation guarantee
+			%JB: guarantee is a constant-factor approximation
+			%JB: conditions for guarantee: linear objective, unused features, Dice dissimilarity, fixed "k" for all sets
+		\end{itemize}
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[t]{(C3) Alternative Feature Selection -- Empirical Results}
+	\begin{figure}
+		\centering
+		\begin{subfigure}[t]{0.32\textwidth}
+			\centering
+			\includegraphics[width=\textwidth, trim={15 15 10 15}, clip]{plots/afs-impact-num-alternatives-tau-train-objective-max-fillna.pdf}
+			\caption{Training-set objective value.}
+		\end{subfigure}
+		\hfill
+		\begin{subfigure}[t]{0.32\textwidth}
+			\centering
+			\includegraphics[width=\textwidth, trim={15 15 10 15}, clip]{plots/afs-impact-num-alternatives-tau-test-objective-max-fillna.pdf}
+			\caption{Test-set objective value.}
+		\end{subfigure}
+		\hfill
+		\begin{subfigure}[t]{0.32\textwidth}
+			\centering
+			\includegraphics[width=\textwidth, trim={15 15 10 15}, clip]{plots/afs-impact-num-alternatives-tau-decision-tree-test-mcc-max-fillna.pdf}
+			\caption{Test-set prediction performance.}
+		\end{subfigure}
+		\caption*{
+			Mean of feature-set quality, over the number of alternatives and dissimilarity threshold~$\tau$, by evaluation metric.
+			%JB: Results from sequential search with \emph{MI} as feature-selection method and $k=10$.
+			%JB: Quality max-normalized per experimental setting, infeasible feature sets assigned a quality of~0.
+		}
+		%JB: here, one of five feature-set quality functions (an univariate objective), ten features to be selected, sequential search only
+		%JB: three evaluation metrics, we take mean over datasets and cross-validation folds
+		%JB: training-set objective value is 1 on 0th alternative due to max normalization (with sequential search run); decreases over number of alternatives, but strong dependecy on "tau", which makes sense (if feature sets have to be more dissimilar, less good features left)
+		%JB: similar (but weaker) trend for other two metrics, but need not be 0 at a=0
+	\end{figure}
 \end{frame}
 
 \section{Constrained Subgroup Discovery}
@@ -398,6 +511,26 @@
 			%JB: selected features made sense to domain experts, mostly related to dislocation density
 		\end{subfigure}
 	\end{figure}
+\end{frame}
+
+\begin{frame}[t]{(C3) Alternative Feature Selection -- Experimental Design}
+	\begin{itemize}
+		\item 30 binary-classification datasets (with 106--9822 data objects and 15--168 features) from \emph{PMLB}~\cite{olson2017pmlb, romano2021pmlb}
+		\item Five feature-set quality measures as objective functions
+		%JB: From different categories: univariate filter (MI), multivariate filter (FCBF/mRMR), wrapper, and post-hoc importance
+		\item Different search configurations for alternatives:
+		\begin{itemize}
+			\item Number of alternatives~$a$
+			%JB: 10 for sequential search, up to 5 for simultaneous search
+			\item Dissimilarity threshold~$\tau$
+			%JB: all distinct values for k=5 and k=10
+			\item Search methods (three solver-based, two heuristics)
+		\end{itemize}
+		\item Metrics: Objective value, prediction performance (MCC~\cite{matthews1975comparison}), and runtime
+		%JB: predictions with decision tree~\cite{breiman1984classification} and random forest~\cite{breiman2001random}; embedded approaches, so they also select features (which is not bad for us, we mainly want to limit input feature set and don't care what model does)
+		\item \emph{SCIP}~\cite{bestuzheva2021scip} (a MIP solver) via {Google OR-Tools}~\cite{perron2022or-tools} as optimizer for solver-based search
+		%JB: set timeout of 60 s, which affects 16% of feature sets in results
+	\end{itemize}
 \end{frame}
 
 \begin{frame}[t, allowframebreaks]{References}
