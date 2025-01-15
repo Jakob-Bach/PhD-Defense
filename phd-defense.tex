@@ -47,10 +47,10 @@
 
 \begin{frame}[t]{Background and Motivation}
 	\begin{definition}[Feature selection]
-		Given a dataset $X \in \mathbb{R}^{m \times n}$
-		and a prediction target $y \in Y^m$ (e.g., $Y = \mathbb{R}$ or $Y = \{0, 1\}$),
-		make a feature-selection decision $s \in \{0,1\}^n$
-		to optimize the feature-set quality $Q(s,X,y)$.
+		Given a dataset~$X \in \mathbb{R}^{m \times n}$
+		with prediction target~$y \in Y^m$ (e.g., $Y = \mathbb{R}$ or $Y = \{0, 1\}$),
+		\emph{feature selection} is the problem of making feature-selection decisions~$s \in \{0,1\}^n$
+		that maximize a given notion of feature-set quality~$Q(s,X,y)$.
 		Typically, select a fixed number of features~$k \in \mathbb{N}$, i.e., $\sum_{j=1}^n s_j = k$.
 	\end{definition}
 	%JB: want to clarify which scenario we talk about
@@ -167,7 +167,24 @@
 
 \begin{frame}[t]{Conclusions}
 	\begin{itemize}
-		\item
+		\item Research gaps -- Most existing methods for feature selection and subgroup discovery:
+		\begin{itemize}
+			\item Do not consider domain knowledge
+			\item Return only one solution, no alternatives
+		\end{itemize}
+		\pause
+		\vspace{\baselineskip}
+		\item Approach: Address both research gaps with constraints on selected feature sets
+		\pause
+		\vspace{\baselineskip}
+		\item Core contributions:
+		\begin{itemize}
+			\item (C1) Evaluating the impact of constraints \cite{bach2022empirical}
+			\item (C2) Using constraints to formulate scientific hypotheses \cite{bach2022empirical}
+			\item (C3) Using constraints for alternative feature sets \cite{bach2023finding, bach2024alternative}
+			\item (C4) Using constraints for feature selection in subgroup discovery \cite{bach2025subgroup, bach2024using}
+		\end{itemize}
+		\item All code and data available online
 	\end{itemize}
 \end{frame}
 
@@ -234,6 +251,39 @@
 			\item Other fields: E.g., clustering~\cite{bailey2014alternative}, number partitioning~\cite{lawrinenko2017identical}, subspace search~\cite{fouche2021efficient}, XAI~\cite{mothilal2020explaining}
 			%JB: problem definitions differ from ours (objective, constraints for alternatives)
 			%JB: XAI example: counterfactuals should have different prediction outcome (rather than similar prediction quality) but similar feature values (rather than different feature selection)
+		\end{itemize}
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[t]{Future Work}
+	%JB: dissertation contains more ideas
+	\begin{itemize}
+		\item Different areas/directions: ML methodology, applied ML, and complexity theory
+		%JB: results in one of these areas may be not that interesting for researchers from other areas
+		\vspace{\baselineskip}
+		\item ML methodology:
+		\begin{itemize}
+			\item Integrating constraints into more methods
+			%JB: for FS, we focused on filter methods / white-box solving; only one wrapper, no embedded method
+			\item Soft constraints
+			%JB: may be violated; multi-objective problem, where solutions from Pareto front may be shown to user, or trade-off parameter
+			\item Feature engineering
+			%JB: could develop constraints for feature-creation operators, and/or consider constraint in automated feature engineering
+		\end{itemize}
+		\item Applied ML:
+		\begin{itemize}
+			\item Case studies with qualitative interpretation of results
+			%JB: our interpretation is quantitative
+			\item User-friendly systems
+			%JB: we have Python packages (friendly for ML experts), but no interface for end users
+		\end{itemize}
+		\item Complexity theory:
+		%JB: also further work regarding NP-hardness possible, e.g., objectives in AFS and feature-set overlap in ASDD
+		\begin{itemize}
+			\item Approximation complexity
+			%JB: rather loose results (APX membership) for one quality function in AFS, no results in SD (though heuristic methods strong there as well)
+			\item Parameterized complexity
+			%JB: rather loose results at moment (XP membership), may be narrowed down
 		\end{itemize}
 	\end{itemize}
 \end{frame}
