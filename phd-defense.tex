@@ -25,6 +25,7 @@
 %\usepackage{amssymb} % mathematical symbols; apparently pre-loaded
 \usepackage[style=numeric, backend=biber]{biblatex}
 %\usepackage{graphicx} % plots; apparently pre-loaded
+\usepackage{subcaption} % subfigures
 %\usepackage{hyperref} % links and URLs; apparently pre-loaded
 
 \addbibresource{references.bib}
@@ -141,15 +142,75 @@
 
 \section{Constrained Feature Selection}
 
-\begin{frame}[t]{Evaluating the Impact of Constraints}
+\begin{frame}[t]{(C1) Evaluating the Impacts of Constraints -- Approach}
 	\begin{itemize}
-		\item
+		\item Systematic study on impact of constraints on feature-selection results
+		\begin{itemize}
+			\item Metrics for constraints, e.g, fraction of valid feature sets
+			%JB: 4 metrics: number of constraints, number of (unique) constrained features, fraction of valid feature sets
+			\item Metrics for results, e.g, feature-set quality
+			%JB: 3 metrics: number of selected features, objective value, prediction performance
+		\end{itemize}
+		\pause
+		\vspace{\baselineskip}
+		\item Experimental design:
+		\begin{itemize}
+			\item 35 regression datasets from \emph{OpenML}~\cite{vanschoren2014openml}
+			%JB: solution counting is expensive, therefore low dimensionality (10-14 features)
+			%JB: 10-fold cross-validation
+			\item Linear objective: $Q(s,X,y) = \sum_{j=1}^{n} q(X_{\cdot{}j},y) \cdot s_j$ (using mutual information~\cite{kraskov2004estimating} as $q(\cdot)$)
+			%JB: very simple notion of feature-set quality (univariate filter)
+			%JB: absolute Pearson correlation yielded similar insights
+			%JB: also train four prediction models trained with selected features afterwards, but not in presented results: linear regression, regression tree, boosted linear model, boosted trees~\cite{chen2016xgboost, pedregosa2011scikit}
+			\item Generate random constraints for ten constraint types with 1000 repetitions
+			%JB: in each repetition, randomly choose features (for a varying number of constraints)
+			%JB: unconstrained base case also is one of the constraint types
+			\item \emph{Z3}~\cite{bjorner2015nuz, deMoura2008z3} (an SMT solver) as optimizer
+		\end{itemize}
 	\end{itemize}
+	\pause
+	\vspace{\baselineskip}
+	\begin{examples}[Constraint types]
+		\begin{itemize}
+			\item $\text{Single-XOR}(s_{j_1}, s_{j_2}) = s_{j_1} \oplus s_{j_2} = (s_{j_1} \land \lnot s_{j_2}) \lor (\lnot s_{j_1} \land s_{j_2})$
+			% JB; some constraints relate to only two features ("single"), some to a group of features ("group"), some to all ("global")
+			\item $\text{Group-NAND}(\{s_{j_1}, \dots, s_{j_{n'}}\}) =	\lnot (s_{j_1} \land s_{j_2} \land \dots \land s_{j_{n'}}) = \sum_{l=1}^{n'} s_{j_l} \leq n'-1$
+		\end{itemize}
+	\end{examples}
+\end{frame}
+
+\begin{frame}[t]{(C1) Evaluating the Impacts of Constraints -- Results}
+	\begin{figure}[htb]
+		\centering
+		\captionsetup{justification=centering}
+		\begin{subfigure}{0.48\textwidth}
+			\centering
+			\includegraphics[width=\textwidth, trim={0 15 0 10}, clip]{plots/syn-selected-vs-objective.pdf}
+			% \caption*{Fraction of selected features vs. normalized objective value.}
+			%JB: all experimental results downsampled to 1000 random results to control plot file size
+			%JB: normalization of number of selected features: divide by number of features in dataset
+			%JB: normalization of objective value: divide by summed quality of all features of dataset
+			%JB: clear correlation between number of selected features and objective (is expected)
+		\end{subfigure}
+		\hfill
+		\begin{subfigure}{0.48\textwidth}
+			\centering
+			\includegraphics[width=\textwidth, trim={0 15 0 10}, clip]{plots/syn-solutions-vs-objective.pdf}
+			% \caption*{Fraction of solutions vs. normalized objective value.}
+			%JB: normalization of number of solutions: divide by total number of solutions (2 ^{number of features})
+			%JB: clear correlation between size of solution space and objective (this trade-off is expected)
+			%JB: even if solution space narrowed down significantly, high objective possible (the inverse does not hold)
+			%JB: but existence of sweet spots naturally depends on dataset (how feature quality distributed)
+			%JB: huge differences of individual evaluation metrics between constraint types
+			%JB: weaker correlation if not taking size of solution space, but a cheaper proxy like number of constraints or number of constrained features
+			%JB: note that we show objective of filter FS here; only weak to moderate correlation between number of solutions and prediction performance
+		\end{subfigure}
+	\end{figure}
 \end{frame}
 
 \section{Alternative Feature Selection}
 
-\begin{frame}[t]{Finding Alternative Feature Sets}
+\begin{frame}[t]{(C3) Finding Alternative Feature Sets}
 	\begin{itemize}
 		\item
 	\end{itemize}
@@ -157,7 +218,7 @@
 
 \section{Constrained Subgroup Discovery}
 
-\begin{frame}[t]{Finding Sparse and Alternative Subgroup Descriptions}
+\begin{frame}[t]{(C4) Finding Small and Alternative Subgroup Descriptions}
 	\begin{itemize}
 		\item
 	\end{itemize}
@@ -286,6 +347,57 @@
 			%JB: rather loose results at moment (XP membership), may be narrowed down
 		\end{itemize}
 	\end{itemize}
+\end{frame}
+
+\begin{frame}[t]{(C2) Scientific Hypotheses as Constraints -- Approach}
+	\begin{itemize}
+		\item Case study on impact of constraints in a specific use case
+		\begin{itemize}
+			\item Scenario~\cite{sudmanns2020data} from materials science: Predict density of dislocation reactions in a specimen under load
+			%JB: Tensile test with aluminum specimen (could also be other face-centered cubic crystal)
+			%JB: Dislocations (defects in material) appear and move as specimen deforms; reaction desnity should be predicted from other physical quantities
+			%JB: Size of (5 micrometers)^3, partitioned into 5^3 voxels
+			%JB: 22 time steps with intervals of ~ 5 ns
+			\item Constraints express preferences regarding feature sets and hypotheses from domain
+			%JB: preferences: global cardinality, inter-correlation, quality filter
+			\item Idea: Hypotheses inconsistent to data should lower prediction quality significantly
+		\end{itemize}
+		\vspace{\baselineskip}
+		\item Experimental design:
+		\begin{itemize}
+			\item One dataset with 14,903 data objects, 135 features, and continuous target
+			\item Linear objective using Pearson correlation as $q(\cdot)$, four prediction models
+			\item Constraint types: Three domain-independent (preferences) and twelve domain-specific (hypotheses)
+		\end{itemize}
+		\vspace{\baselineskip}
+		\begin{example}[Constraint type]
+			$\text{Aggregate-or-original}(\{s_1, \dots, s_n\}) = \bigwedge_{p \in P} \left( \left( \bigvee_{a \in A} s_{(p,a)} \right) + \left( \bigvee_{l \in \{1, \dots, 12\}} s_{(p,l)} \right) \leq 1 \right)$\\
+			$\leftrightarrow$ ``For each physical quantity $p$, do not select aggregate features $a$ and original features $l$ at the same time.'' %JB: original features measured in 12 directions (slip systems)
+		\end{example}
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[t]{(C2) Scientific Hypotheses as Constraints -- Results}
+	\begin{figure}
+		\centering
+		\begin{subfigure}{0.48\textwidth}
+			\centering
+			\includegraphics[width=\textwidth, trim={0 15 0 15}, clip]{plots/ms-prediction-performance-cardinality.pdf}
+			\caption*{Distribution of prediction quality over constraint types (hypotheses).}
+			%JB: performance for k=5 comparable to k=10, and even simple linear regression good (feature selection makes sense in scenario)
+			%JB: not much difference of prediction performance between constraint types -> cannot invalidate hypotheses
+			%JB: similar observations as for prediction performance also for objective value
+		\end{subfigure}
+		\hfill
+		\begin{subfigure}{0.48\textwidth}
+			\centering
+			\includegraphics[width=0.7\textwidth, trim={0 15 0 15}, clip]{plots/ms-selected-similarity-card10.pdf}
+			\caption*{Overlap size of feature sets between constraint types (for $k=10$).}
+			%JB: event though prediction performance similar, feature sets might differ -> interesting alternatives
+			%JB: still, quite often results similar to UNCONSTRAINED (D12) -> constraints might not affect top features or top feature set might already satisfy constraints -> iterating with domain experts probably better
+			%JB: selected features made sense to domain experts, mostly related to dislocation density
+		\end{subfigure}
+	\end{figure}
 \end{frame}
 
 \backupend
