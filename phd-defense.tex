@@ -41,23 +41,30 @@
 
 \setbeamercovered{invisible} % use "transparent" to show later content of animated slide in gray
 
+\newcommand{\longcite}[1]{\citeauthor{#1} (\citeyear{#1}) \cite{#1}}  % we generally have numeric style but partly use "Author (year) [ref]" as well
+
 \begin{document}
 
 \KITtitleframe
 
 \section{Introduction}
 
-\begin{frame}[t]{Background and Motivation}
+\begin{frame}[t]{Background}
+	%JB: want to clarify which scenario we talk about
+	%JB: very generally, we are in field of data science / machine learning, want to make predictions
 	\begin{definition}[Feature selection]
+		\pause
 		Given a dataset~$X \in \mathbb{R}^{m \times n}$
-		with prediction target~$y \in Y^m$ (e.g., $Y = \mathbb{R}$ or $Y = \{0, 1\}$),
-		\emph{feature selection} is the problem of making feature-selection decisions~$s \in \{0,1\}^n$
-		that maximize a given notion of feature-set quality~$Q(s,X,y)$.
+		with prediction target~$y \in Y^m$ (e.g., $Y = \mathbb{R}$ or $Y = \{0, 1\}$),\\
+		\pause
+		\emph{feature selection} is the problem of making feature-selection decisions~$s \in \{0,1\}^n$\\
+		\pause
+		that maximize a given notion of feature-set quality~$Q(s,X,y)$.\\
+		\pause
 		Typically, select a fixed number of features~$k \in \mathbb{N}$, i.e., $\sum_{j=1}^n s_j = k$.
 	\end{definition}
-	%JB: want to clarify which scenario we talk about
-	%JB: very generally, we are in field of data science / machine learning
-	%JB: focus on supervised feature selection for tabular data
+	%JB: tabular data, where rows are data objects ("m" is their number) and columns are features ("n" is their number)
+	%JB: supervised scenario
 	%JB: examples for prediction target from our experiments (though our methods are domain-independent): is person credit-worthy? is e-mail spam? is mushroom poisonous? will horse survive illness?
 	%JB: feature engineering already done (e.g., in spam example)
 	%JB: different white-box and black-box objectives for quality, depending on feature-selection method (from correlating each feature with the target to running a genetic algorithm wrapped around a prediction model)
@@ -66,84 +73,126 @@
 	\begin{itemize}
 		\item Reasons for feature selection~\cite{chandrashekar2014survey, li2017feature}:
 		\begin{itemize}
-			\item Reduce computational requirements (CPU, memory, storage) of machine learning
-			%JB: training and prediction
-			\item Improve prediction performance
-			% JB: IMHO questionable
 			\item Increase interpretability of predictions
+			%JB: most important reason for us (matches theme of user-centricity)
+			%JB: prediction models with less features tend to be more interpretable but also depends on model
+			\item Reduce computational requirements (CPU, memory, storage, power consumption) of machine learning
+			%JB: requirements for training and prediction
+			\item Improve prediction performance
+			%JB: has been argued in literature, but IMHO questionable since you throw away information
+			%JB: some models better if irrelevant or misleading information removed beforehand
 		\end{itemize}
-		\pause
-		\vspace{\baselineskip}
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[t]{Motivation and Our Approach}
+	\begin{itemize}
 		\item Main limitations of most existing feature-selection methods:
 		\begin{itemize}
 			\item Do not consider domain knowledge
 			%JB: Q() is a technical criterion, and there are typically no constraints apart from cardinality
 			%JB: technically good feature sets may still be hard to interpret if they don't make sense from domain perspective
+			%JB: e.g., domain experts may say that if certain feature selected, another should be selected as well, or two features should NOT be selected simultaneously
 			%JB: domain knowledge may be firm, hypotheses, preferences
 			%JB: in literature, there are at most approaches integrating specific constraint types into specific FS methods (apart from the work of Groves)
 			\item Return only one feature set, no alternatives
 			%JB: may be misleading if there are alternative solutions with similar quality
+			%JB: e.g., if domain experts derive hypotheses about domain from selected features
 		\end{itemize}
-	\end{itemize}
-\end{frame}
-
-\begin{frame}[t]{Approach}
-	\begin{itemize}
+		\pause
+		\vspace{\baselineskip}
 		\item Central idea of dissertation: Make feature selection more user-centric via constraints
 		%JB: we use constraints in propositional logic and linear arithmetic
 		\begin{itemize}
 			\item Still optimize feature-set quality but restrict valid feature selections
-			\item Formulate as white-box optimization problem and use (MIP/SMT) solver
+			\item Formulate as white-box optimization problem and use solver
 		\end{itemize}
 		\pause
 		%
 		\begin{example}[A feature-selection constraint in propositional logic]
 			$(\lnot s_1 \land \lnot s_2 \land \lnot s_3) \lor (s_1 \land s_2 \land s_3) \leftrightarrow$ ``Select none or all of Features 1, 2, and 3.''
 		\end{example}
+		%JB: that formulation is rather general; more specific: scientific study and several features together characterize an underlying qunatity/mechanism, so either all or none should be selected
 		%
 		\pause
-		\vspace{0.5\baselineskip}
+		\vspace{0.2\baselineskip}
 		\item Benefits of our approach:
 		\begin{itemize}
 			\item Declarative
 			\item Allows combining constraints
 			\item Orthogonal to choice of feature-selection method
 			%JB: related work typically integrates one constraint type into one feature-selection method
+			%JB: feature-selection method determines objective, our constraints are independent of objective
+			%JB: solver accepts a broad range of constraints and there are general way to combine solver with objective
 		\end{itemize}
 	\end{itemize}
 \end{frame}
 
-\begin{frame}[t]{Contributions}
-	\label{slide:contributions}
-	\begin{itemize}
-		\item Four core contributions of our dissertation:
-		%JB: correspond to four chapters in main part
+\begin{frame}[t]{Our Contributions}
+	\vspace{-\baselineskip} % \columns seems to add vertical whitespace
+	%JB: four core contributions, correspond to four chapters in main part of dissertation
+	%JB: will discuss these to varying degree (due to limited time)
+	\begin{columns}
+		\column[t]{0.55\textwidth}
 		\begin{itemize}
 			\item (C1) Evaluating the impact of constraints \cite{bach2022empirical}
-			\item (C2) Using constraints to formulate scientific hypotheses \cite{bach2022empirical}
-			\item (C3) Using constraints for alternative feature sets \cite{bach2023finding, bach2024alternative}
-			\item (C4) Using constraints for feature selection in subgroup discovery \cite{bach2025subgroup, bach2024using}
-		\end{itemize}
-		\item Sub-contributions like formalization, (complexity) analyses, and experimental studies
-		%JB: presentation will focus on (C3) and (C4)
-		\pause
-		\vspace{\baselineskip}
-		%JB: Meta-contibution:
-		\item Reproducibility:
-		\begin{itemize}
-			\item All experimental data available on \href{https://doi.org/10.35097/4kjyeg0z2bxmr6eh}{RADAR4KIT}
-			\item All code available:
 			\begin{itemize}
+				\item Formalize constrained feature selection
+				%JB: general framework on which later work builds
+				\item Domain-independent study on impact of constraints
+				%JB: more on that later
+			\end{itemize}
+			\item (C2) Using constraints to formulate scientific hypotheses \cite{bach2022empirical}
+			\begin{itemize}
+				\item Domain-specific study on impact of constraints
+				%JB: in materials science (will not be discussed in detail); worked with domain experts to formulate constraints
+			\end{itemize}
+			%JB: worked on (C1) and (C2) in parallel (same formalization, but experiments domain- independent vs. specific), joint publication
+			\pause
+			\item (C3) Using constraints for alternative feature sets \cite{bach2023finding, bach2024alternative}
+			\begin{itemize}
+				\item Formalize alternative feature selection
+				\item Discuss integrating constraints
+				%JB: into feature-selection methods
+				\item Analyze time complexity
+				\item Propose heuristic search methods
+				%JB: besides solver-based search
+				\item Experimental study
+			\end{itemize}
+			%JB: now focus on a specific, domain-independent constraint type
+			%JB: second publication (with journal and arXiv version)
+		\end{itemize}
+		\pause
+		\column[t]{0.41\textwidth}
+		\begin{itemize}
+			\item (C4) Using constraints for feature selection in subgroup discovery \cite{bach2025subgroup, bach2024using}
+			%JB: we will discuss subgroup discovery later; can be seen as an extension of feature selection
+			\begin{itemize}
+				\item Formalize subgroup-discovery as SMT optimization problem
+				\item Formalize two constraint types
+				\item Discuss integrating constraints
+				\item Analyze time complexity
+				\item Experimental study
+			\end{itemize}
+			%JB: can see some similarity: formalization, analysis, experiments
+			%JB: again, specific constraint types
+			%JB: third publication (with confererence and arXiv version)
+			\pause
+			\item Reproducibility:
+			%JB: more a meta-contribution
+			\begin{itemize}
+				\item All experimental data available on \href{https://doi.org/10.35097/4kjyeg0z2bxmr6eh}{RADAR4KIT}
 				\item Three GitHub repositories [\href{https://github.com/Jakob-Bach/Constrained-Filter-Feature-Selection}{a}, \href{https://github.com/Jakob-Bach/Alternative-Feature-Selection}{b}, \href{https://github.com/Jakob-Bach/Constrained-Subgroup-Discovery}{c}]
-				\item Three Python packages on PyPI: \href{https://pypi.org/project/alfese/}{\texttt{alfese}}, \href{https://pypi.org/project/cffs/}{\texttt{cffs}}, and \href{https://pypi.org/project/csd/}{\texttt{csd}}
+				\item Three Python packages: \href{https://pypi.org/project/alfese/}{\texttt{alfese}}, \href{https://pypi.org/project/cffs/}{\texttt{cffs}}, \href{https://pypi.org/project/csd/}{\texttt{csd}}
 			\end{itemize}
 		\end{itemize}
-	\end{itemize}
+	\end{columns}
 \end{frame}
 
 \section{Constrained Feature Selection}
 
 \begin{frame}[t]{(C1) Evaluating the Impacts of Constraints -- Approach}
+	%JB: after general overview of our work, now deeper into a concrete contribution
 	\begin{itemize}
 		\item Systematic study on impact of constraints on feature-selection results
 		\begin{itemize}
@@ -167,10 +216,11 @@
 			%JB: in each repetition, randomly choose features (for a varying number of constraints)
 			%JB: unconstrained base case also is one of the constraint types
 			\item \emph{Z3}~\cite{bjorner2015nuz, deMoura2008z3} (an SMT solver) as optimizer
+			%JB: SMT = Satisfiablity Modulo Theories: generalizes propositional logic (in our case, with linear arithmetic) (other explanation: first-order logic but with specific interpretations of functions and predicates)
 		\end{itemize}
 	\end{itemize}
 	\pause
-	\vspace{\baselineskip}
+	\vspace{0.5\baselineskip}
 	\begin{examples}[Constraint types]
 		\begin{itemize}
 			\item $\text{Single-XOR}(s_{j_1}, s_{j_2}) = s_{j_1} \oplus s_{j_2} = (s_{j_1} \land \lnot s_{j_2}) \lor (\lnot s_{j_1} \land s_{j_2})$
@@ -185,7 +235,7 @@
 		\centering
 		\begin{subfigure}{0.48\textwidth}
 			\centering
-			\includegraphics[width=\textwidth, trim={0 15 0 10}, clip]{plots/syn-selected-vs-objective.pdf}
+			\includegraphics[width=0.95\textwidth, trim={0 15 0 10}, clip]{plots/syn-selected-vs-objective.pdf}
 			% \caption*{Fraction of selected features vs. normalized objective value.}
 			%JB: all experimental results downsampled to 1000 random results to control plot file size
 			%JB: normalization of number of selected features: divide by number of features in dataset
@@ -195,7 +245,7 @@
 		\hfill
 		\begin{subfigure}{0.48\textwidth}
 			\centering
-			\includegraphics[width=\textwidth, trim={0 15 0 10}, clip]{plots/syn-solutions-vs-objective.pdf}
+			\includegraphics[width=0.95\textwidth, trim={0 15 0 10}, clip]{plots/syn-solutions-vs-objective.pdf}
 			% \caption*{Fraction of solutions vs. normalized objective value.}
 			%JB: normalization of number of solutions: divide by total number of solutions (2 ^{number of features})
 			%JB: clear correlation between size of solution space and objective (this trade-off is expected)
@@ -206,6 +256,8 @@
 			%JB: note that we show objective of filter FS here; only weak to moderate correlation between number of solutions and prediction performance
 		\end{subfigure}
 	\end{figure}
+	\centering
+	$\mathit{frac}_{\text{se}} = \frac{\sum_{j=1}^{n} s_j}{n}$ \quad \vline \quad $Q_{\text{norm}} = \frac{\sum_{j=1}^{n} s_j  \cdot q(X_{\cdot{}j},y)}{\sum_{j=1}^{n} q(X_{\cdot{}j},y)}$ \quad \vline \quad $\mathit{frac}_{\text{so}} = \frac{\sum_{s \in \{0,1\}^n} \underset{c \in C}{\min}~c(s)}{2^n}$
 \end{frame}
 
 \section{Alternative Feature Selection}
@@ -262,7 +314,7 @@
 	\begin{itemize}
 		\item Used dissimilarity measure: $d_{\text{Dice}}(F',F'') = 1 - \frac{2 \cdot |F' \cap F''|}{|F'| + |F''|} = 1 - \frac{\sum_{j=1}^n s'_j \cdot s''_j}{\sum_{j=1}^n s'_j + \sum_{j=1}^n s''_j}$
 		%JB: remember that we use binary selection variables "s_j", which form vector "s" for each feature set
-		%JB: for fixed feature-set sizes, resulting constraint becomes linear
+		%JB: for fixed feature-set sizes, resulting constraint becomes linear (in sequential search) or can easily be linearized (in simultaneous search)
 	\end{itemize}
 \end{frame}
 
@@ -374,6 +426,7 @@
 \end{frame}
 
 \begin{frame}[t]{(C4) Subgroup Discovery -- Formalization: Unconstrained}
+	\vspace{-\baselineskip}
 	%JB: contribution: SMT encoding for problem such that solver-based solution possible
 	%JB: "unconstrained" in sense of no additional constraints apart from ones inherent in problem
 	\begin{align*}
@@ -408,7 +461,7 @@
 		\item Formally: Limit number of features whose bounds exclude at least one data object from subgroup
 		%JB: i.e., technically, a feature appearing in subgroup description may still not be selected (cannot happen in our implementation because we post-process bounds of subgroups accordingly)
 		\pause
-		\vspace{\baselineskip}
+		\vspace{0.5\baselineskip}
 		\begin{equation*}
 			\begin{aligned}
 				\onslide<3->{
@@ -449,9 +502,10 @@
 			\centering
 			\includegraphics[width=\textwidth, trim={15 50 15 15}, clip]{plots/csd-cardinality-train-nwracc-no-timeout-datasets.pdf}
 			\caption*{Mean training-set subgroup quality over feature-cardinality threshold~$k$.}
+			%JB: only datasets without solver timeouts
 			%JB: 95% confidence intervals based on datasets and cross-validation folds
-			%JB: six SD methods and sic feature-cardinality thresholds
-			%JB: on average, heuristics "Beam" and "BI" beat solver-based search due to timeouts (here, largest timeout setting of 2048~s); however, even without latter, only small difference
+			%JB: six SD methods and six feature-cardinality thresholds
+			%JB: heuristics "Beam" and "BI" very close to exact optimum (interesting)
 			%JB: increase of subgroup quality over "k" is small, i.e., small subgroup descriptions already yield high quality
 		\end{subfigure}
 		\hfill
@@ -484,10 +538,10 @@
 		\vspace{\baselineskip}
 		\item Core contributions:
 		\begin{itemize}
-			\item (C1) Evaluating the impact of constraints \cite{bach2022empirical}
-			\item (C2) Using constraints to formulate scientific hypotheses \cite{bach2022empirical}
-			\item (C3) Using constraints for alternative feature sets \cite{bach2023finding, bach2024alternative}
-			\item (C4) Using constraints for feature selection in subgroup discovery \cite{bach2025subgroup, bach2024using}
+			\item (C1) Evaluating the impact of constraints: \longcite{bach2022empirical}
+			\item (C2) Using constraints to formulate scientific hypotheses: \longcite{bach2022empirical}
+			\item (C3) Using constraints for alternative feature sets: \longcite{bach2023finding}, \longcite{bach2024alternative}
+			\item (C4) Using constraints for feature selection in subgroup discovery: Bach (2025) \cite{bach2025subgroup}, \longcite{bach2024using} % first reference in this line doesn't have year (is included in "howpublished"), so we manually cite it
 		\end{itemize}
 		\item All code and data available online
 	\end{itemize}
@@ -520,42 +574,6 @@
 			\item \fullcite{bach2025subgroup}
 		\end{itemize}
 	\end{itemize}
-\end{frame}
-
-\begin{frame}[t]{Detailed List of Contributions}
-	\begin{columns}
-		\column[t]{0.55\textwidth}
-		\begin{itemize}
-			\item (C1) Evaluating the impact of constraints \cite{bach2022empirical}
-			\begin{itemize}
-				\item Formalize constrained feature selection
-				\item Domain-independent study on impact of constraints
-			\end{itemize}
-			\item (C2) Using constraints to formulate scientific hypotheses \cite{bach2022empirical}
-			\begin{itemize}
-				\item Domain-specific study on impact of constraints
-			\end{itemize}
-			\item (C3) Using constraints for alternative feature sets \cite{bach2023finding, bach2024alternative}
-			\begin{itemize}
-				\item Formalize alternative feature selection
-				\item Discuss integrating constraints
-				\item Analyze time complexity
-				\item Propose heuristic search methods
-				\item Experimental study
-			\end{itemize}
-		\end{itemize}
-		\column[t]{0.41\textwidth}
-		\begin{itemize}
-			\item (C4) Using constraints for feature selection in subgroup discovery \cite{bach2025subgroup, bach2024using}
-			\begin{itemize}
-				\item Formalize subgroup-discovery as SMT optimization problem
-				\item Formalize two constraint types
-				\item Discuss integrating constraints
-				\item Analyze time complexity
-				\item Experimental study
-			\end{itemize}
-		\end{itemize}
-	\end{columns}
 \end{frame}
 
 \begin{frame}[t]{Related Work}
@@ -649,7 +667,7 @@
 			\item Linear objective using Pearson correlation as $q(\cdot)$, four prediction models
 			\item Constraint types: Three domain-independent (preferences) and twelve domain-specific (hypotheses)
 		\end{itemize}
-		\vspace{\baselineskip}
+		\vspace{0.5\baselineskip}
 		\begin{example}[Constraint type]
 			$\text{Aggregate-or-original}(\{s_1, \dots, s_n\}) = \bigwedge_{p \in P} \left( \left( \bigvee_{a \in A} s_{(p,a)} \right) + \left( \bigvee_{l \in \{1, \dots, 12\}} s_{(p,l)} \right) \leq 1 \right)$\\
 			$\leftrightarrow$ ``For each physical quantity $p$, do not select aggregate features $a$ and original features $l$ at the same time.'' %JB: original features measured in 12 directions (slip systems)
