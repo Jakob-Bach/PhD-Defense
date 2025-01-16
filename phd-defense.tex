@@ -431,43 +431,6 @@
 	\end{itemize}
 \end{frame}
 
-\begin{frame}[t]{(C4) Constrained Subgroup Discovery -- Complexity}
-	\begin{itemize}
-		\item Subgroup discovery with a feature-cardinality constraint is $\mathcal{NP}$-complete
-		\pause
-		\item Proof: Reduction from \textsc{Set Covering}~\cite{karp1972reducibility}
-		\begin{itemize}
-			\item Original problem: Given set of elements~$E = \{e_1, \dots, e_m\}$, set of sets~$\mathbb{S} = \{S_1,  \dots, S_n\}$ with $E = \bigcup_{S \in \mathbb{S}} S$, and a cardinality~$k \in \mathbb{N}$, does subset $\mathbb{C} \subseteq \mathbb{S}$ with $|\mathbb{C}| \leq k$ and $E = \bigcup_{S \in \mathbb{C}} S$ exist?
-			\pause
-			\item Perfect-subgroup discovery: Find subgroup containing all positive data objects ($y_i = 1$) and zero negatives ($y_i = 0$)
-			%JB: may not exist, i.e., search problem instead of optimization problem
-			\pause
-			\item Problem transformation:
-			%JB: from set covering to perfect-subgroup discovery
-			\begin{itemize}
-				\item Dataset~$X \in \{0, 1\}^{(m + 1) \times n}$ with $X_{ij} := (e_i \in S_j)$
-				%JB: elements become data objects, sets become features, set membership becomes feature value
-				%JB: binary is special case of real-valued
-				\item Data Object $m+1$ represents element not contained in any set, i.e., $X_{(m+1)j} = 0$
-				\item Prediction target $y \in \{0, 1\}^{m+1}$ with $y_{m+1} = 1$ and $y_i = 0$ otherwise
-				%JB: indicates whether not contained in any set
-				%JB: further, parameter "k" remains as-is
-			\end{itemize}
-			\pause
-			\item Perfect subgroup only contains Data Object $m+1$ and uses $\mathit{lb}_j = \mathit{ub}_j = 0$ conditions for selected features
-			%JB: new data object only has 0 as feature values
-			%JB: bounds [0, 1] represent unselected features
-			\item Other data objects have value 1 for at least one selected feature $\rightarrow$ each element is in a selected set
-			\pause
-			\item I.e., algorithm for perfect-subgroup discovery also solves \textsc{Set Covering}
-			%JB: however, latter is NP-hard, so former is NP-hard as well (and NP-complete since in NP)
-			\pause
-			\item Optimizing subgroup quality typically at least as hard as finding perfect subgroup
-			%JB: depends on notion of subgroup quality
-		\end{itemize}
-	\end{itemize}
-\end{frame}
-
 \begin{frame}[t]{(C4) Constrained Subgroup Discovery -- Empirical Results}
 	%JB: conduct four different kinds of experiments
 	\begin{figure}
@@ -769,6 +732,37 @@
 			%JB: however, linear and antimonotonic (Dice and Jaccard are not), which eases integration into solver and heuristics
 		\end{equation*}
 		%JB: other constraints from subgroup discovery remain in problem as is
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[t]{(C4) Subgroup Discovery -- Complexity}
+	\begin{itemize}
+		\item Subgroup discovery with a feature-cardinality constraint is $\mathcal{NP}$-complete
+		\item Proof: Reduction from \textsc{Set Covering}~\cite{karp1972reducibility}
+		\begin{itemize}
+			\item Original problem: Given set of elements~$E = \{e_1, \dots, e_m\}$, set of sets~$\mathbb{S} = \{S_1,  \dots, S_n\}$ with $E = \bigcup_{S \in \mathbb{S}} S$, and a cardinality~$k \in \mathbb{N}$, does subset $\mathbb{C} \subseteq \mathbb{S}$ with $|\mathbb{C}| \leq k$ and $E = \bigcup_{S \in \mathbb{C}} S$ exist?
+			\item Perfect-subgroup discovery: Find subgroup containing all positive data objects ($y_i = 1$) and zero negatives ($y_i = 0$)
+			%JB: may not exist, i.e., search problem instead of optimization problem
+			\item Problem transformation:
+			%JB: from set covering to perfect-subgroup discovery
+			\begin{itemize}
+				\item Dataset~$X \in \{0, 1\}^{(m + 1) \times n}$ with $X_{ij} := (e_i \in S_j)$
+				%JB: elements become data objects, sets become features, set membership becomes feature value
+				%JB: binary is special case of real-valued
+				\item Data Object $m+1$ represents element not contained in any set, i.e., $X_{(m+1)j} = 0$
+				\item Prediction target $y \in \{0, 1\}^{m+1}$ with $y_{m+1} = 1$ and $y_i = 0$ otherwise
+				%JB: indicates whether not contained in any set
+				%JB: further, parameter "k" remains as-is
+			\end{itemize}
+			\item Perfect subgroup only contains Data Object $m+1$ and uses $\mathit{lb}_j = \mathit{ub}_j = 0$ conditions for selected features
+			%JB: new data object only has 0 as feature values
+			%JB: bounds [0, 1] represent unselected features
+			\item Other data objects have value 1 for at least one selected feature $\rightarrow$ each element is in a selected set
+			\item I.e., algorithm for perfect-subgroup discovery also solves \textsc{Set Covering}
+			%JB: however, latter is NP-hard, so former is NP-hard as well (and NP-complete since in NP)
+			\item Optimizing subgroup quality typically at least as hard as finding perfect subgroup
+			%JB: depends on notion of subgroup quality
+		\end{itemize}
 	\end{itemize}
 \end{frame}
 
