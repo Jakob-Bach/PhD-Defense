@@ -26,6 +26,7 @@
 \usepackage[style=numeric, backend=biber]{biblatex}
 %\usepackage{graphicx} % plots; apparently pre-loaded
 \usepackage{subcaption} % subfigures
+\usepackage{tikz} % used for non-float figure positioning
 %\usepackage{hyperref} % links and URLs; apparently pre-loaded
 
 \addbibresource{references.bib}
@@ -331,10 +332,177 @@
 
 \section{Constrained Subgroup Discovery}
 
-\begin{frame}[t]{(C4) Finding Small and Alternative Subgroup Descriptions}
+\begin{frame}[t]{(C4) Constrained Subgroup Discovery -- Approach}
 	\begin{itemize}
-		\item
+		\item Subgroup discovery: ``Identifying descriptions of subsets of a dataset that show an interesting behavior''~\cite{atzmueller2015subgroup}
+		%JB: `Descriptions of subsets': E.g., restrict ranges of numerical features or select particular values of categorical features
+		%JB: unlike typical ML prediction models, need not cover full dataset with one subgroup
+		%JB: Kind of extension to feature selection (one binary decision for each feature; now values play a role)
+		%JB: `Interesting': Based on quality criterion, e.g., (relative) frequency of one particular class label
+		\pause
+		\vspace{\baselineskip}
+		\item Scope: Binary classification with real-valued features
+		\begin{itemize}
+			\item Tabular dataset $X \in \mathbb{R}^{m \times n}$ (data objects $\times$ features)
+			%JB: there also are variants of subgroup discovery that are more like frequent itemset mining, with binary feature values and only value 1 used in subgroup descriptions
+			\item Prediction target $y \in \{0, 1\}^m$ (`interesting'/`positive' = 1)
+			%JB: in regression, interestingness could refer to low or high values of target
+			\pause
+			\item Subgroup quality: Weighted Relative Accuracy
+			\begin{itemize}
+				\item $\text{WRACC} = \frac{m_b}{m} \cdot \left( \frac{m_b^+}{m_b} - \frac{m^+}{m} \right)$~\cite{lavravc1999rule}
+				%JB: first factor is subgroup size, second is relative accuracy (precision in subgroup vs overall)
+				\item \emph{+} $\leftrightarrow$ positive data object, \emph{b} $\leftrightarrow$ in subgroup (box)
+			\end{itemize}
+		\end{itemize}
+		\pause
+		\vspace{\baselineskip}
+		\item Our goal: Improve interpretability with constraints
+		%JB: on selected features
+		\begin{itemize}
+			\item Limit number of used features
+			%JB: mainly discuss this constraint type in the following
+			\item Find alternative subgroup descriptions
+		\end{itemize}
 	\end{itemize}
+	\pause[0] % \visible or \onslide did not work, so we reset pause counter to show figure immediately
+	\begin{tikzpicture}[remember picture,overlay]
+		\node[xshift=-120pt,yshift=-140pt] at (current page.north east) {
+			\includegraphics[width=0.45\textwidth, trim=80 15 100 15, clip]{plots/csd-exemplary-subgroup.pdf}
+		};
+	\end{tikzpicture}
+\end{frame}
+
+\begin{frame}[t]{(C4) Subgroup Discovery -- Formalization: Unconstrained}
+	%JB: contribution: SMT encoding for problem such that solver-based solution possible
+	%JB: "unconstrained" in sense of no additional constraints apart from ones inherent in problem
+	\begin{align*}
+		\onslide<5->{
+			\max &\quad & Q_{\text{WRAcc}} &= \frac{m_b^+}{m} - \frac{m_b \cdot m^+}{m^2} \tag*{(Objective: subgroup quality)} \\
+			%JB: actually linar
+		}
+		\onslide<4->{
+			\text{s.t.:} &\quad & m_b &:= \sum_{i=1}^{m} b_i \quad\text{and}\quad m_b^+ := \sum_{\substack{i \in \{1, \dots, m\} \\ y_i = 1 }} b_i \tag*{(Num of data objects in subgroup)} \\
+		}
+		\onslide<3->{
+			&\quad \forall i \in \{1, \dots, m\} & b_i &\leftrightarrow \bigwedge_{j \in \{1, \dots, n\}} \left( \left( X_{ij} \geq \mathit{lb}_j \right) \land \left( X_{ij} \leq \mathit{ub}_j \right) \right) \tag*{(i-th data object in subgroup?)} \\
+		}
+		\onslide<2->{
+			&\quad \forall j \in \{1, \dots, n\} & \mathit{lb}_j &\leq \mathit{ub}_j \tag*{(Constraint: relationship between bounds)} \\
+			%JB: technically, you could even leave constraint out in most situations, as solutions with UB < LB would contain zero data objects in box and therefore have WRAcc = 0, while even a box containing only one positive data object (and nothing else) has a WRAcc > 0; however, if (1) feature values of all positive objects also exist with negative labels (no separation possible) and also there is no option to form an empty box (i.e., all combinations of feature values exist), or (2) there is a lower bound of number of instances covered, then best WRAcc may become < 0
+		}
+		\onslide<3->{
+			&\quad & b &\in \{0, 1\}^m \tag*{(Auxiliary variables: subgroup membership)}  \\
+			%JB: not strictly necessary (expressions above could be inlined), but I used variables in implemenentation (though not for m_b and m_b^+, which therefore have := in definition)
+		}
+		\onslide<1->{
+			&\quad & \mathit{lb}, \mathit{ub} &\in \{\mathbb{R} \cup \{-\infty, +\infty\}\}^n \tag*{(Variables: lower/upper bounds of subgroup)}
+		}
+	\end{align*}
+\end{frame}
+
+\begin{frame}[t]{(C4) Subgroup Discovery -- Formalization: Cardinality}
+	\begin{itemize}
+		\item Concept: Limit number of features used (= selected) in subgroup description to $k \in \mathbb{N}$
+		%JB: "k" is a user parameter
+		\item Formally: Limit number of features whose bounds exclude at least one data object from subgroup
+		%JB: i.e., technically, a feature appearing in subgroup description may still not be selected (cannot happen in our implementation because we post-process bounds of subgroups accordingly)
+		\pause
+		\vspace{\baselineskip}
+		\begin{equation*}
+			\begin{aligned}
+				\onslide<3->{
+					\forall j \in \{1, \dots, n\}: && s^{\text{lb}}_j &\leftrightarrow \left( \mathit{lb}_j > \min_{i \in \{1, \dots, m\}} X_{ij} \right) \\
+					\forall j \in \{1, \dots, n\}: &&s^{\text{ub}}_j &\leftrightarrow \left( \mathit{ub}_j < \max_{i \in \{1, \dots, m\}} X_{ij} \right) \\
+					%JB: min and max feature values are constants here
+				}
+				\onslide<4->{
+					\forall j \in \{1, \dots, n\}: && s_j &\leftrightarrow \left( s^{\text{lb}}_j \lor s^{\text{ub}}_j \right) \\
+				}
+				\onslide<5->{
+					&& \sum_{j=1}^n s_j &\leq k \\
+				}
+				\onslide<2->{
+					&& s, s^{\text{lb}}, s^{\text{ub}} &\in \{0, 1\}^n \\
+					%JB: like b_i, these variables are not strictly necessary (could be inlined) but our implementation uses them
+				}
+			\end{aligned}
+		\end{equation*}
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[t]{(C4) Constrained Subgroup Discovery -- Complexity}
+	\begin{itemize}
+		\item Subgroup discovery with a feature-cardinality constraint is $\mathcal{NP}$-complete
+		\pause
+		\item Proof: Reduction from \textsc{Set Covering}~\cite{karp1972reducibility}
+		\begin{itemize}
+			\item Original problem: Given set of elements~$E = \{e_1, \dots, e_m\}$, set of sets~$\mathbb{S} = \{S_1,  \dots, S_n\}$ with $E = \bigcup_{S \in \mathbb{S}} S$, and a cardinality~$k \in \mathbb{N}$, does subset $\mathbb{C} \subseteq \mathbb{S}$ with $|\mathbb{C}| \leq k$ and $E = \bigcup_{S \in \mathbb{C}} S$ exist?
+			\pause
+			\item Perfect-subgroup discovery: Find subgroup containing all positive data objects ($y_i = 1$) and zero negatives ($y_i = 0$)
+			%JB: may not exist, i.e., search problem instead of optimization problem
+			\pause
+			\item Problem transformation:
+			%JB: from set covering to perfect-subgroup discovery
+			\begin{itemize}
+				\item Dataset~$X \in \{0, 1\}^{(m + 1) \times n}$ with $X_{ij} := (e_i \in S_j)$
+				%JB: elements become data objects, sets become features, set membership becomes feature value
+				%JB: binary is special case of real-valued
+				\item Data Object $m+1$ represents element not contained in any set, i.e., $X_{(m+1)j} = 0$
+				\item Prediction target $y \in \{0, 1\}^{m+1}$ with $y_{m+1} = 1$ and $y_i = 0$ otherwise
+				%JB: indicates whether not contained in any set
+				%JB: further, parameter "k" remains as-is
+			\end{itemize}
+			\pause
+			\item Perfect subgroup only contains Data Object $m+1$ and uses $\mathit{lb}_j = \mathit{ub}_j = 0$ conditions for selected features
+			%JB: new data object only has 0 as feature values
+			%JB: bounds [0, 1] represent unselected features
+			\item Other data objects have value 1 for at least one selected feature $\rightarrow$ each element is in a selected set
+			\pause
+			\item I.e., algorithm for perfect-subgroup discovery also solves \textsc{Set Covering}
+			%JB: however, latter is NP-hard, so former is NP-hard as well (and NP-complete since in NP)
+			\pause
+			\item Optimizing subgroup quality typically at least as hard as finding perfect subgroup
+			%JB: depends on notion of subgroup quality
+		\end{itemize}
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[t]{(C4) Constrained Subgroup Discovery -- Empirical Results}
+	%JB: conduct four different kinds of experiments
+	\begin{figure}
+		\centering
+		\begin{subfigure}[t]{0.32\textwidth}
+			\centering
+			\includegraphics[width=\textwidth, trim={15 -29 15 15}, clip]{plots/csd-timeouts-nwracc.pdf} % actual bottom trimming should be different, but we use a negative number to manually top-align the figures (instead of only the captions)
+			\caption*{Mean subgroup quality over solver timeouts for \emph{SMT} search.}
+			%JB: without a feature-cardinality constraint
+			%JB: for solver-based search we propose, one can vary timeout
+			%JB: increase of subgroup-quality with timeout, and decreasing marginal gain (note logarithmic x-axis)
+		\end{subfigure}
+		\hfill
+		\pause
+		\begin{subfigure}[t]{0.32\textwidth}
+			\centering
+			\includegraphics[width=\textwidth, trim={15 50 15 15}, clip]{plots/csd-cardinality-train-nwracc-no-timeout-datasets.pdf}
+			\caption*{Mean training-set subgroup quality over feature-cardinality threshold~$k$.}
+			%JB: 95% confidence intervals based on datasets and cross-validation folds
+			%JB: six SD methods and sic feature-cardinality thresholds
+			%JB: on average, heuristics "Beam" and "BI" beat solver-based search due to timeouts (here, largest timeout setting of 2048~s); however, even without latter, only small difference
+			%JB: increase of subgroup quality over "k" is small, i.e., small subgroup descriptions already yield high quality
+		\end{subfigure}
+		\hfill
+		\pause
+		\begin{subfigure}[t]{0.32\textwidth}
+			\centering
+			\includegraphics[width=\textwidth, trim={15 50 15 15}, clip]{plots/csd-alternatives-jaccard.pdf}
+			\caption*{Mean similarity of alternative subgroup descriptions.}
+			%JB: over the number of alternatives, by subgroup-discovery method and dissimilarity threshold~$\tau_{\text{abs}}$
+			%JB: two SD methods, parameters for alternatives varied
+			%JB: alternative subgroup descriptions less (data-object) similar to original the more alternatives desired and the higher (feature-selection) dissimilarity threshold (similar to AFS)
+			%JB: similar trend for subgroup quality
+		\end{subfigure}
+	\end{figure}
 \end{frame}
 
 \section{Conclusion}
@@ -562,10 +730,75 @@
 			%JB: all distinct values for k=5 and k=10
 			\item Search methods (three solver-based, two heuristics)
 		\end{itemize}
-		\item Metrics: Objective value, prediction performance (MCC~\cite{matthews1975comparison}), and runtime
+		\item Evaluation metrics:
+		\begin{itemize}
+			\item Objective value
+			\item Prediction performance (MCC~\cite{matthews1975comparison})
+			%JB: first two items quantify feature-set quality
+			\item Runtime
+			\item Optimization status
+		\end{itemize}
 		%JB: predictions with decision tree~\cite{breiman1984classification} and random forest~\cite{breiman2001random}; embedded approaches, so they also select features (which is not bad for us, we mainly want to limit input feature set and don't care what model does)
 		\item \emph{SCIP}~\cite{bestuzheva2021scip} (a MIP solver) via {Google OR-Tools}~\cite{perron2022or-tools} as optimizer for solver-based search
 		%JB: set timeout of 60 s, which affects 16% of feature sets in results
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[t]{(C4) Subgroup Discovery -- Formalization: Alternatives}
+	\begin{itemize}
+		\item Concept: Cover similar set of data objects as given subgroup with different set of selected features
+		\begin{itemize}
+			\item Repeat sequentially to get $a \in \mathbb{N}$ alternatives for dissimilarity threshold~$\tau \in \mathbb{R}_{\geq 0}$
+			%JB: in my work on alternative feature selection, same user parameters
+		\end{itemize}
+		\vspace{\baselineskip}
+		\item Chosen optimization objective: Maximize normalized Hamming similarity (= prediction accuracy)
+		%JB: new objective! don't optimize subgroup quality anymore
+		\begin{equation*}
+			\text{sim}_{\text{nHamm}}(b^{(a)}, b^{(0)}) = \frac{1}{m} \cdot \sum_{i=1}^m \left( b_i^{(a)} \leftrightarrow b_i^{(0)} \right) = \frac{1}{m} \cdot \Big( \sum\limits_{\substack{i \in \{1, \dots, m\} \\ b_i^{(0)} = 1}} b_i^{(a)} + \sum\limits_{\substack{i \in \{1, \dots, m\} \\ b_i^{(0)} = 0}} \lnot b_i^{(a)} \Big)
+			%JB: reminder: b_i denotes whether data object in subgroup or not
+			%JB: (0) is orignal subgroup, (a) the alternative
+			%JB: is linear (logical NOT can be linearized easily), while Jaccard similarity is not
+		\end{equation*}
+		\item Chosen dissimilarity constraints: From each existing feature set, deselect at least $\tau_{\text{abs}} \in \mathbb{N}$ (but $\leq k$) features
+		%JB: "deselect": do not select again
+		\begin{equation*}
+			\forall l \in \{0, \dots, a-1\}:~ \text{dis}_{\text{des}}(s^{(a)}, s^{(l)}) = \sum_{\substack{j \in \{1, \dots, n\} \\ s^{(l)}_j = 1}} \lnot s^{(a)}_j \geq \min \left( \tau_{\text{abs}},~k^{(l)} \right)
+			%JB: min prevents infeasibility
+			%JB: not a commonly used measure, not even symmetric
+			%JB: however, linear and antimonotonic (Dice and Jaccard are not), which eases integration into solver and heuristics
+		\end{equation*}
+		%JB: other constraints from subgroup discovery remain in problem as is
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[t]{(C4) Subgroup Discovery -- Experimental Design}
+	\begin{itemize}
+		\item 27 binary-classification datasets (with 106--9822 data objects and 20--168 features) from \emph{PMLB}~\cite{olson2017pmlb, romano2021pmlb}
+		\item Six subgroup-discovery methods:
+		\begin{itemize}
+			\item Solver-based (novel): \emph{SMT} (using \emph{Z3}~\cite{bjorner2015nuz, deMoura2008z3} as optimizer)
+			\item Heuristics (related work): \emph{Beam}, \emph{BI}~\cite{mampaey2012efficient}, \emph{PRIM}~\cite{friedman1999bump}
+			%JB: iteratively and greedily restrict the subgroup's bounds, with one feature per iteration (PRIM: prune fixed fraction of data objects; Beam/BI: test all possible cuts)
+			\item Baselines (novel): \emph{MORS} (Minimal Optimal Recall Subgroup), \emph{Random}
+			%JB: MORS -- minimal bounds such that all positive data objects are in subgroup (exclude as many negative data objects as possible); will play a bigger role in PhD Colloquium on complexity
+			%JB: Random -- repeated random sampling of bounds
+		\end{itemize}
+		%JB: hyperparameters fixed for all methods
+		\item Four experimental scenarios: Unconstrained, two constraint types, and solver timeouts
+		%JB: in conference version, only phrased as two scenarios (the two constraint types)
+		\begin{itemize}
+			\item Solver timeouts: \{1~s, 2~s, 4~s, $\dots$, 2048~s\}
+			\item Feature-cardinality constraints: $k \in \{1, 2, 3, 4, 5\}$
+			\item Alternative subgroup descriptions: $k=3$, $a=5$, and $\tau_{\text{abs}} \in \{1, 2, 3\}$
+		\end{itemize}
+		\item Evaluation metrics:
+		\begin{itemize}
+			\item Subgroup quality (nWRAcc~\cite{lavravc1999rule, mathonat2021anytime})
+			\item Runtime
+			\item For alternatives: Similarity~\cite{choi2010survey} (Normalized Hamming and Jaccard)
+		\end{itemize}
+		\item \emph{Z3}~\cite{bjorner2015nuz, deMoura2008z3} (an SMT solver) as optimizer for solver-based search
 	\end{itemize}
 \end{frame}
 
