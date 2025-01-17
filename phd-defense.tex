@@ -25,7 +25,7 @@
 %\usepackage{amssymb} % mathematical symbols; apparently pre-loaded
 \usepackage[style=numeric, backend=biber]{biblatex}
 %\usepackage{graphicx} % plots; apparently pre-loaded
-\usepackage{subcaption} % subfigures
+\usepackage[font=normalsize]{subcaption} % subfigures
 \usepackage{tikz} % used for non-float figure positioning
 %\usepackage{hyperref} % links and URLs; apparently pre-loaded
 
@@ -41,7 +41,7 @@
 
 \setbeamercovered{invisible} % use "transparent" to show later content of animated slide in gray
 
-\newcommand{\longcite}[1]{\citeauthor{#1} (\citeyear{#1}) \cite{#1}}  % we generally have numeric style but partly use "Author (year) [ref]" as well
+\renewcommand{\textcite}[1]{\citeauthor{#1} (\citeyear{#1}) \cite{#1}}  % we generally have numeric style, but want longer citations on one slide; \textcite only shows author name(s) for our citation style, so we redefine it to "<<Author(s)>> (<<year>>) [<<ref>>]"
 
 \begin{document}
 
@@ -236,7 +236,6 @@
 		\begin{subfigure}{0.48\textwidth}
 			\centering
 			\includegraphics[width=0.95\textwidth, trim={0 15 0 10}, clip]{plots/syn-selected-vs-objective.pdf}
-			% \caption*{Fraction of selected features vs. normalized objective value.}
 			%JB: all experimental results downsampled to 1000 random results to control plot file size
 			%JB: normalization of number of selected features: divide by number of features in dataset
 			%JB: normalization of objective value: divide by summed quality of all features of dataset
@@ -246,7 +245,6 @@
 		\begin{subfigure}{0.48\textwidth}
 			\centering
 			\includegraphics[width=0.95\textwidth, trim={0 15 0 10}, clip]{plots/syn-solutions-vs-objective.pdf}
-			% \caption*{Fraction of solutions vs. normalized objective value.}
 			%JB: normalization of number of solutions: divide by total number of solutions (2 ^{number of features})
 			%JB: clear correlation between size of solution space and objective (this trade-off is expected)
 			%JB: even if solution space narrowed down significantly, high objective possible (the inverse does not hold)
@@ -371,7 +369,7 @@
 			\caption{Test-set prediction performance.}
 		\end{subfigure}
 		\caption*{
-			Mean of feature-set quality, over the number of alternatives and dissimilarity threshold~$\tau$, by evaluation metric.
+			\normalsize Mean of feature-set quality, over the number of alternatives and dissimilarity threshold~$\tau$, by evaluation metric. % global caption-font-size setting not picked up here, so adjusted manually
 			%JB: Results from sequential search with \emph{MI} as feature-selection method and $k=10$.
 			%JB: Quality max-normalized per experimental setting, infeasible feature sets assigned a quality of~0.
 		}
@@ -490,7 +488,7 @@
 		\centering
 		\begin{subfigure}[t]{0.32\textwidth}
 			\centering
-			\includegraphics[width=\textwidth, trim={15 -29 15 15}, clip]{plots/csd-timeouts-nwracc.pdf} % actual bottom trimming should be different, but we use a negative number to manually top-align the figures (instead of only the captions)
+			\includegraphics[width=\textwidth, trim={15 -27 15 15}, clip]{plots/csd-timeouts-nwracc.pdf} % actual bottom trimming should be different, but we use a negative number to manually top-align the figures (instead of only the captions)
 			\caption*{Mean subgroup quality over solver timeouts for \emph{SMT} search.}
 			%JB: without a feature-cardinality constraint
 			%JB: for solver-based search we propose, one can vary timeout
@@ -500,7 +498,7 @@
 		\pause
 		\begin{subfigure}[t]{0.32\textwidth}
 			\centering
-			\includegraphics[width=\textwidth, trim={15 50 15 15}, clip]{plots/csd-cardinality-train-nwracc-no-timeout-datasets.pdf}
+			\includegraphics[width=\textwidth, trim={15 50 15 18}, clip]{plots/csd-cardinality-train-nwracc-no-timeout-datasets.pdf}
 			\caption*{Mean training-set subgroup quality over feature-cardinality threshold~$k$.}
 			%JB: only datasets without solver timeouts
 			%JB: 95% confidence intervals based on datasets and cross-validation folds
@@ -512,7 +510,7 @@
 		\pause
 		\begin{subfigure}[t]{0.32\textwidth}
 			\centering
-			\includegraphics[width=\textwidth, trim={15 50 15 15}, clip]{plots/csd-alternatives-jaccard.pdf}
+			\includegraphics[width=\textwidth, trim={15 50 15 18}, clip]{plots/csd-alternatives-jaccard.pdf}
 			\caption*{Mean similarity of alternative subgroup descriptions.}
 			%JB: over the number of alternatives, by subgroup-discovery method and dissimilarity threshold~$\tau_{\text{abs}}$
 			%JB: two SD methods, parameters for alternatives varied
@@ -538,10 +536,10 @@
 		\vspace{\baselineskip}
 		\item Core contributions:
 		\begin{itemize}
-			\item (C1) Evaluating the impact of constraints: \longcite{bach2022empirical}
-			\item (C2) Using constraints to formulate scientific hypotheses: \longcite{bach2022empirical}
-			\item (C3) Using constraints for alternative feature sets: \longcite{bach2023finding}, \longcite{bach2024alternative}
-			\item (C4) Using constraints for feature selection in subgroup discovery: Bach (2025) \cite{bach2025subgroup}, \longcite{bach2024using} % first reference in this line doesn't have year (is included in "howpublished"), so we manually cite it
+			\item (C1) Evaluating the impact of constraints: \textcite{bach2022empirical}
+			\item (C2) Using constraints to formulate scientific hypotheses: \textcite{bach2022empirical}
+			\item (C3) Using constraints for alternative feature sets: \textcite{bach2023finding}, \textcite{bach2024alternative}
+			\item (C4) Using constraints for feature selection in subgroup discovery: Bach (2025) \cite{bach2025subgroup}, \textcite{bach2024using} % first reference in this line doesn't have year (is included in "howpublished"), so we manually cite it
 		\end{itemize}
 		\item All code and data available online
 	\end{itemize}
@@ -680,8 +678,8 @@
 		\centering
 		\begin{subfigure}{0.48\textwidth}
 			\centering
-			\includegraphics[width=\textwidth, trim={0 15 0 15}, clip]{plots/ms-prediction-performance-cardinality.pdf}
-			\caption*{Distribution of prediction quality over constraint types (hypotheses).}
+			\includegraphics[width=\textwidth, trim={0 20 0 15}, clip]{plots/ms-prediction-performance-cardinality.pdf}
+			\caption*{Distribution of prediction quality over constraint types (which express scientific hypotheses).}
 			%JB: performance for k=5 comparable to k=10, and even simple linear regression good (feature selection makes sense in scenario)
 			%JB: not much difference of prediction performance between constraint types -> cannot invalidate hypotheses
 			%JB: similar observations as for prediction performance also for objective value
@@ -689,8 +687,8 @@
 		\hfill
 		\begin{subfigure}{0.48\textwidth}
 			\centering
-			\includegraphics[width=0.7\textwidth, trim={0 15 0 15}, clip]{plots/ms-selected-similarity-card10.pdf}
-			\caption*{Overlap size of feature sets between constraint types (for $k=10$).}
+			\includegraphics[width=0.7\textwidth, trim={0 20 0 15}, clip]{plots/ms-selected-similarity-card10.pdf}
+			\caption*{Overlap size of feature sets between constraint types (for selecting $k=10$ features).}
 			%JB: event though prediction performance similar, feature sets might differ -> interesting alternatives
 			%JB: still, quite often results similar to UNCONSTRAINED (D12) -> constraints might not affect top features or top feature set might already satisfy constraints -> iterating with domain experts probably better
 			%JB: selected features made sense to domain experts, mostly related to dislocation density
