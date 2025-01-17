@@ -24,6 +24,7 @@
 %\usepackage{amsmath} % mathematical symbols and equations; apparently pre-loaded
 %\usepackage{amssymb} % mathematical symbols; apparently pre-loaded
 \usepackage[style=numeric, backend=biber]{biblatex}
+\usepackage{booktabs} % nicely formatted tables (with top, mid, and bottom rule)
 %\usepackage{graphicx} % plots; apparently pre-loaded
 \usepackage[font=normalsize]{subcaption} % subfigures
 \usepackage{tikz} % used for non-float figure positioning
@@ -69,21 +70,39 @@
 	%JB: feature engineering already done (e.g., in spam example)
 	%JB: different white-box and black-box objectives for quality, depending on feature-selection method (from correlating each feature with the target to running a genetic algorithm wrapped around a prediction model)
 	\pause
-	\vspace{\baselineskip}
-	\begin{itemize}
-		\item Reasons for feature selection~\cite{chandrashekar2014survey, li2017feature}:
+	\vspace{-0.5\baselineskip}
+	\begin{columns}
+		\column[t]{0.50\textwidth}
 		\begin{itemize}
-			\item Increase interpretability of predictions
-			%JB: most important reason for us (matches theme of user-centricity)
-			%JB: prediction models with less features tend to be more interpretable but also depends on model
-			\item Reduce computational requirements (CPU, memory, storage, power consumption) of machine learning
-			%JB: requirements for training and prediction
-			\item Improve prediction performance
-			%JB: has been argued in literature, but IMHO questionable since you throw away information
-			%JB: some models better if irrelevant or misleading information removed beforehand
+			\item Reasons for feature selection~\cite{chandrashekar2014survey, li2017feature}:
+			\begin{itemize}
+				\item Increase interpretability of predictions
+				%JB: most important reason for us (matches theme of user-centricity)
+				%JB: prediction models with less features tend to be more interpretable but also depends on model
+				\item Reduce computational requirements of machine learning (CPU, memory, storage, power consumption)
+				%JB: requirements for training and prediction
+				\item Improve prediction performance
+				%JB: has been argued in literature, but IMHO questionable since you throw away information
+				%JB: some models better if irrelevant or misleading information removed beforehand
+			\end{itemize}
 		\end{itemize}
-	\end{itemize}
-\end{frame}
+		\column[t]{0.46\textwidth}
+		\pause[2] % show table together with first part of definition
+		\vspace{-0.5\baselineskip}
+		\begin{table}
+			\begin{tabular}{cccccc}
+				\cmidrule(lr){1-4} \cmidrule(lr){6-6}
+				Feat\_1 & Feat\_2 & \dots & Feat\_$n$ & \quad & Target \\
+				\cmidrule(lr){1-4} \cmidrule(lr){6-6}
+				$X_{11}$ & $X_{12}$ & \dots & $X_{1n}$ & & $y_1$ \\
+				$X_{21}$ & $X_{22}$ & \dots & $X_{2n}$ & & $y_2$ \\
+				\dots & \dots & \dots & \dots & & \dots \\
+				$X_{m1}$ & $X_{m2}$ & \dots & $X_{mn}$ & & $y_m$ \\
+				\cmidrule(lr){1-4} \cmidrule(lr){6-6}
+			\end{tabular}
+		\end{table}
+	\end{columns}
+*\end{frame}
 
 \begin{frame}[t]{Motivation and Our Approach}
 	\begin{itemize}
@@ -222,6 +241,7 @@
 	\pause
 	\vspace{0.5\baselineskip}
 	\begin{examples}[Constraint types]
+		\setlength{\leftmargini}{0.4cm} % box is aligned with slide's itemize, so we need not move items in box a bit to right (setting only applies locally)
 		\begin{itemize}
 			\item $\text{Single-XOR}(s_{j_1}, s_{j_2}) = s_{j_1} \oplus s_{j_2} = (s_{j_1} \land \lnot s_{j_2}) \lor (\lnot s_{j_1} \land s_{j_2})$
 			% JB; some constraints relate to only two features ("single"), some to a group of features ("group"), some to all ("global")
@@ -310,7 +330,7 @@
 	\pause
 	\vspace{\baselineskip}
 	\begin{itemize}
-		\item Used dissimilarity measure: $d_{\text{Dice}}(F',F'') = 1 - \frac{2 \cdot |F' \cap F''|}{|F'| + |F''|} = 1 - \frac{\sum_{j=1}^n s'_j \cdot s''_j}{\sum_{j=1}^n s'_j + \sum_{j=1}^n s''_j}$
+		\item Used dissimilarity measure: $d_{\text{Dice}}(F',F'') = 1 - \frac{2 \cdot |F' \cap F''|}{|F'| + |F''|} = 1 - \frac{2 \cdot \sum_{j=1}^n s'_j \cdot s''_j}{\sum_{j=1}^n s'_j + \sum_{j=1}^n s''_j}$
 		%JB: remember that we use binary selection variables "s_j", which form vector "s" for each feature set
 		%JB: for fixed feature-set sizes, resulting constraint becomes linear (in sequential search) or can easily be linearized (in simultaneous search)
 	\end{itemize}
