@@ -102,7 +102,7 @@
 			\end{tabular}
 		\end{table}
 	\end{columns}
-*\end{frame}
+\end{frame}
 
 \begin{frame}[t]{Motivation and Our Approach}
 	\begin{itemize}
@@ -128,10 +128,10 @@
 		\end{itemize}
 		\pause
 		%
-		\begin{example}[A feature-selection constraint in propositional logic]
+		\begin{example}[A feature-selection constraint]
 			$(\lnot s_1 \land \lnot s_2 \land \lnot s_3) \lor (s_1 \land s_2 \land s_3) \leftrightarrow$ ``Select none or all of Features 1, 2, and 3.''
 		\end{example}
-		%JB: that formulation is rather general; more specific: scientific study and several features together characterize an underlying qunatity/mechanism, so either all or none should be selected
+		%JB: that formulation is rather general; more specific: scientific study and several features together characterize an underlying quantity/mechanism, so either all or none should be selected
 		%
 		\pause
 		\vspace{0.2\baselineskip}
@@ -148,6 +148,7 @@
 \end{frame}
 
 \begin{frame}[t]{Our Contributions}
+	\label{slide:contributions}
 	\vspace{-\baselineskip} % \columns seems to add vertical whitespace
 	%JB: four core contributions, correspond to four chapters in main part of dissertation
 	%JB: will discuss these to varying degree (due to limited time)
@@ -158,12 +159,12 @@
 			\begin{itemize}
 				\item Formalize constrained feature selection
 				%JB: general framework on which later work builds
-				\item Domain-independent study on impact of constraints
+				\item Conduct domain-independent study on impact of constraints
 				%JB: more on that later
 			\end{itemize}
 			\item (C2) Using constraints to formulate scientific hypotheses \cite{bach2022empirical}
 			\begin{itemize}
-				\item Domain-specific study on impact of constraints
+				\item Conduct domain-specific study on impact of constraints
 				%JB: in materials science (will not be discussed in detail); worked with domain experts to formulate constraints
 			\end{itemize}
 			%JB: worked on (C1) and (C2) in parallel (same formalization, but experiments domain- independent vs. specific), joint publication
@@ -176,7 +177,7 @@
 				\item Analyze time complexity
 				\item Propose heuristic search methods
 				%JB: besides solver-based search
-				\item Experimental study
+				\item Conduct experimental study
 			\end{itemize}
 			%JB: now focus on a specific, domain-independent constraint type
 			%JB: second publication (with journal and arXiv version)
@@ -187,15 +188,15 @@
 			\item (C4) Using constraints for feature selection in subgroup discovery \cite{bach2025subgroup, bach2024using}
 			%JB: we will discuss subgroup discovery later; can be seen as an extension of feature selection
 			\begin{itemize}
-				\item Formalize subgroup-discovery as SMT optimization problem
+				\item Formalize subgroup discovery as SMT optimization problem
 				\item Formalize two constraint types
 				\item Discuss integrating constraints
 				\item Analyze time complexity
-				\item Experimental study
+				\item Conduct experimental study
 			\end{itemize}
 			%JB: can see some similarity: formalization, analysis, experiments
 			%JB: again, specific constraint types
-			%JB: third publication (with confererence and arXiv version)
+			%JB: third publication (with conference and arXiv version)
 			\pause
 			\item Reproducibility:
 			%JB: more a meta-contribution
@@ -215,9 +216,9 @@
 	\begin{itemize}
 		\item Systematic study on impact of constraints on feature-selection results
 		\begin{itemize}
-			\item Metrics for constraints, e.g, fraction of valid feature sets
+			\item Metrics for constraints, e.g., fraction of valid feature sets
 			%JB: 4 metrics: number of constraints, number of (unique) constrained features, fraction of valid feature sets
-			\item Metrics for results, e.g, feature-set quality
+			\item Metrics for results, e.g., feature-set quality
 			%JB: 3 metrics: number of selected features, objective value, prediction performance
 		\end{itemize}
 		\pause
@@ -235,7 +236,7 @@
 			%JB: in each repetition, randomly choose features (for a varying number of constraints)
 			%JB: unconstrained base case also is one of the constraint types
 			\item \emph{Z3}~\cite{bjorner2015nuz, deMoura2008z3} (an SMT solver) as optimizer
-			%JB: SMT = Satisfiablity Modulo Theories: generalizes propositional logic (in our case, with linear arithmetic) (other explanation: first-order logic but with specific interpretations of functions and predicates)
+			%JB: SMT = Satisfiability Modulo Theories: generalizes propositional logic (in our case, with linear arithmetic) (other explanation: first-order logic but with specific interpretations of functions and predicates)
 		\end{itemize}
 	\end{itemize}
 	\pause
@@ -292,8 +293,8 @@
 			\item Domain-independent constraint type
 			\item Orthogonal to choice of feature-selection method
 			%JB: we discuss integration into various methods
-			\item Sequential or simultaneous search
 			\item Number of alternatives~$a \in \mathbb{N}_0$ and feature-set dissimilarity threshold $\tau \in [0,1]$ as user parameters
+			\item Sequential or simultaneous search
 		\end{itemize}
 	\end{itemize}
 	\pause
@@ -330,7 +331,7 @@
 	\pause
 	\vspace{\baselineskip}
 	\begin{itemize}
-		\item Used dissimilarity measure: $d_{\text{Dice}}(F',F'') = 1 - \frac{2 \cdot |F' \cap F''|}{|F'| + |F''|} = 1 - \frac{2 \cdot \sum_{j=1}^n s'_j \cdot s''_j}{\sum_{j=1}^n s'_j + \sum_{j=1}^n s''_j}$
+		\item Chosen dissimilarity measure: $d_{\text{Dice}}(F',F'') = 1 - \frac{2 \cdot |F' \cap F''|}{|F'| + |F''|} = 1 - \frac{2 \cdot \sum_{j=1}^n s'_j \cdot s''_j}{\sum_{j=1}^n s'_j + \sum_{j=1}^n s''_j}$
 		%JB: remember that we use binary selection variables "s_j", which form vector "s" for each feature set
 		%JB: for fixed feature-set sizes, resulting constraint becomes linear (in sequential search) or can easily be linearized (in simultaneous search)
 	\end{itemize}
@@ -338,7 +339,7 @@
 
 \begin{frame}[t]{(C3) Alternative Feature Selection -- Complexity}
 	\begin{itemize}
-		\item Alternative feature selection is $\mathcal{NP}$-complete if:
+		\item Alternative feature selection is $\mathcal{NP}$-complete in scenario with:
 		\begin{itemize}
 			\item Simultaneous search with minimum as aggregation operator $\text{agg}(\cdot)$
 			\item Linear notion of feature-set quality: $Q(s,X,y) = \sum_{j=1}^{n} q_j \cdot s_j$
@@ -355,7 +356,7 @@
 		\vspace{\baselineskip}
 		\item Further complexity-related contributions and results:
 		\begin{itemize}
-			\item Prove $\mathcal{NP}$-hardness for incomplete partitioning and feature-set overlap
+			\item Prove $\mathcal{NP}$-hardness for (1) incomplete partitioning and (2) feature-set overlap
 			%JB: drop two of the four assumptions above
 			%JB: reduction from base case above (no overlap, complete partitioning)
 			\pause
@@ -395,7 +396,7 @@
 		}
 		%JB: here, one of five feature-set quality functions (an univariate objective), ten features to be selected, sequential search only
 		%JB: three evaluation metrics, we take mean over datasets and cross-validation folds
-		%JB: training-set objective value is 1 on 0th alternative due to max normalization (with sequential search run); decreases over number of alternatives, but strong dependecy on "tau", which makes sense (if feature sets have to be more dissimilar, less good features left)
+		%JB: training-set objective value is 1 on 0th alternative due to max normalization (with sequential search run); decreases over number of alternatives, but strong dependency on "tau", which makes sense (if feature sets have to be more dissimilar, less good features left)
 		%JB: similar (but weaker) trend for other two metrics, but need not be 0 at a=0
 	\end{figure}
 \end{frame}
@@ -420,7 +421,7 @@
 			\pause
 			\item Subgroup quality: Weighted Relative Accuracy
 			\begin{itemize}
-				\item $\text{WRACC} = \frac{m_b}{m} \cdot \left( \frac{m_b^+}{m_b} - \frac{m^+}{m} \right)$~\cite{lavravc1999rule}
+				\item $\text{WRAcc} = \frac{m_b}{m} \cdot \left( \frac{m_b^+}{m_b} - \frac{m^+}{m} \right)$~\cite{lavravc1999rule}
 				%JB: first factor is subgroup size, second is relative accuracy (precision in subgroup vs overall)
 				\item \emph{+} $\leftrightarrow$ positive data object, \emph{b} $\leftrightarrow$ in subgroup (box)
 			\end{itemize}
@@ -443,14 +444,14 @@
 	\end{tikzpicture}
 \end{frame}
 
-\begin{frame}[t]{(C4) Subgroup Discovery -- Formalization: Unconstrained}
+\begin{frame}[t]{(C4) Subgroup Discovery -- Formalization: Basic Problem}
 	\vspace{-\baselineskip}
 	%JB: contribution: SMT encoding for problem such that solver-based solution possible
 	%JB: "unconstrained" in sense of no additional constraints apart from ones inherent in problem
 	\begin{align*}
 		\onslide<5->{
 			\max &\quad & Q_{\text{WRAcc}} &= \frac{m_b^+}{m} - \frac{m_b \cdot m^+}{m^2} \tag*{(Objective: subgroup quality)} \\
-			%JB: actually linar
+			%JB: actually linear
 		}
 		\onslide<4->{
 			\text{s.t.:} &\quad & m_b &:= \sum_{i=1}^{m} b_i \quad\text{and}\quad m_b^+ := \sum_{\substack{i \in \{1, \dots, m\} \\ y_i = 1 }} b_i \tag*{(Num of data objects in subgroup)} \\
@@ -464,7 +465,8 @@
 		}
 		\onslide<3->{
 			&\quad & b &\in \{0, 1\}^m \tag*{(Auxiliary variables: subgroup membership)}  \\
-			%JB: not strictly necessary (expressions above could be inlined), but I used variables in implemenentation (though not for m_b and m_b^+, which therefore have := in definition)
+			%JB: not strictly necessary (expressions above could be inlined), but I used variables in implementation (though not for m_b and m_b^+, which therefore have := in definition)
+			%JB: b_i are also used when defining problem for alternative subgroup descriptions
 		}
 		\onslide<1->{
 			&\quad & \mathit{lb}, \mathit{ub} &\in \{\mathbb{R} \cup \{-\infty, +\infty\}\}^n \tag*{(Variables: lower/upper bounds of subgroup)}
@@ -544,7 +546,7 @@
 
 \begin{frame}[t]{Conclusions}
 	\begin{itemize}
-		\item Research gaps -- Most existing methods for feature selection and subgroup discovery:
+		\item Research gaps -- Most existing methods for feature selection:
 		\begin{itemize}
 			\item Do not consider domain knowledge
 			\item Return only one solution, no alternatives
@@ -575,7 +577,7 @@
 
 \section{Appendix}
 
-\begin{frame}[t]{Details of Underlying Publications}
+\begin{frame}[t]{Details of Our Underlying Publications}
 	\begin{itemize}
 		\item Constrained feature selection (\hyperlink{slide:contributions}{C1} and \hyperlink{slide:contributions}{C2}):
 		\begin{itemize}
@@ -601,7 +603,7 @@
 		\begin{itemize}
 			\item Feature selection: Typically only combination of one constraint type (like cost~\cite{paclik2002feature, plasberg2009feature}, cardinality~\cite{khushaba2011feature, yang2015budget}, or group~\cite{jacob2009group, yuan2006model}) and feature-selection method; exceptions (wrapper methods with black-box constraints):~\cite{groves2015toward, neutatz2021enforcing}
 			%JB: Groves (2015) ignores invalid feature sets in four wrapper FS methods (no white-box solver), uses narrow set of constraint types (related to hierarchical feature grouping and temporal lags)
-			%JB: Neutatz (2021) works with black-box constraints that mostly relate to whole ML system (acuuracy, fairness, training time, etc.) rather than feature selection per se (except number of selected features) and are checked after training/evaluation
+			%JB: Neutatz (2021) works with black-box constraints that mostly relate to whole ML system (accuracy, fairness, training time, etc.) rather than feature selection per se (except number of selected features) and are checked after training/evaluation
 			%JB: other notions of "constrained feature selection" include semi-supervised learning (constraints related to data objects) and Bayesian network learning (conditional independence constraints, learned and propagated automatically)
 			\item Subgroup discovery: White-box formulations of different problem definitions~\cite{eckstein2002maximum, louveaux2014combinatorial} and integration of constraints into algorithmic search methods~\cite{atzmueller2005exploiting, meeng2021real}
 			%JB: other white-box formulations use different constraint types, are CP or MIP (but not SMT), and do not compare against heuristics
@@ -671,7 +673,7 @@
 		\begin{itemize}
 			\item Scenario~\cite{sudmanns2020data} from materials science: Predict density of dislocation reactions in a specimen under load
 			%JB: Tensile test with aluminum specimen (could also be other face-centered cubic crystal)
-			%JB: Dislocations (defects in material) appear and move as specimen deforms; reaction desnity should be predicted from other physical quantities
+			%JB: Dislocations (defects in material) appear and move as specimen deforms; reaction density should be predicted from other physical quantities
 			%JB: Size of (5 micrometers)^3, partitioned into 5^3 voxels
 			%JB: 22 time steps with intervals of ~ 5 ns
 			\item Constraints express preferences regarding feature sets and hypotheses from domain
@@ -756,7 +758,7 @@
 		\begin{equation*}
 			\text{sim}_{\text{nHamm}}(b^{(a)}, b^{(0)}) = \frac{1}{m} \cdot \sum_{i=1}^m \left( b_i^{(a)} \leftrightarrow b_i^{(0)} \right) = \frac{1}{m} \cdot \Big( \sum\limits_{\substack{i \in \{1, \dots, m\} \\ b_i^{(0)} = 1}} b_i^{(a)} + \sum\limits_{\substack{i \in \{1, \dots, m\} \\ b_i^{(0)} = 0}} \lnot b_i^{(a)} \Big)
 			%JB: reminder: b_i denotes whether data object in subgroup or not
-			%JB: (0) is orignal subgroup, (a) the alternative
+			%JB: (0) is original subgroup, (a) the alternative
 			%JB: is linear (logical NOT can be linearized easily), while Jaccard similarity is not
 		\end{equation*}
 		\item Chosen dissimilarity constraints: From each existing feature set, deselect at least $\tau_{\text{abs}} \in \mathbb{N}$ (but $\leq k$) features
@@ -776,7 +778,7 @@
 		\item Subgroup discovery with a feature-cardinality constraint is $\mathcal{NP}$-complete
 		\item Proof: Reduction from \textsc{Set Covering}~\cite{karp1972reducibility}
 		\begin{itemize}
-			\item Original problem: Given set of elements~$E = \{e_1, \dots, e_m\}$, set of sets~$\mathbb{S} = \{S_1,  \dots, S_n\}$ with $E = \bigcup_{S \in \mathbb{S}} S$, and a cardinality~$k \in \mathbb{N}$, does subset $\mathbb{C} \subseteq \mathbb{S}$ with $|\mathbb{C}| \leq k$ and $E = \bigcup_{S \in \mathbb{C}} S$ exist?
+			\item Set-covering problem: Given set of elements~$E = \{e_1, \dots, e_m\}$, set of sets~$\mathbb{S} = \{S_1,  \dots, S_n\}$ with $E = \bigcup_{S \in \mathbb{S}} S$, and a cardinality~$k \in \mathbb{N}$, does subset $\mathbb{C} \subseteq \mathbb{S}$ with $|\mathbb{C}| \leq k$ and $E = \bigcup_{S \in \mathbb{C}} S$ exist?
 			\item Perfect-subgroup discovery: Find subgroup containing all positive data objects ($y_i = 1$) and zero negatives ($y_i = 0$)
 			%JB: may not exist, i.e., search problem instead of optimization problem
 			\item Problem transformation:
@@ -785,7 +787,7 @@
 				\item Dataset~$X \in \{0, 1\}^{(m + 1) \times n}$ with $X_{ij} := (e_i \in S_j)$
 				%JB: elements become data objects, sets become features, set membership becomes feature value
 				%JB: binary is special case of real-valued
-				\item Data Object $m+1$ represents element not contained in any set, i.e., $X_{(m+1)j} = 0$
+				\item Data Object $m+1$ represents an element not contained in any set, i.e., $X_{(m+1)j} = 0$
 				\item Prediction target $y \in \{0, 1\}^{m+1}$ with $y_{m+1} = 1$ and $y_i = 0$ otherwise
 				%JB: indicates whether not contained in any set
 				%JB: further, parameter "k" remains as-is
@@ -796,7 +798,7 @@
 			\item Other data objects have value 1 for at least one selected feature $\rightarrow$ each element is in a selected set
 			\item I.e., algorithm for perfect-subgroup discovery also solves \textsc{Set Covering}
 			%JB: however, latter is NP-hard, so former is NP-hard as well (and NP-complete since in NP)
-			\item Optimizing subgroup quality typically at least as hard as finding perfect subgroup
+			\item Finally, optimizing subgroup quality typically at least as hard as finding perfect subgroup
 			%JB: depends on notion of subgroup quality
 		\end{itemize}
 	\end{itemize}
@@ -828,7 +830,6 @@
 			\item Runtime
 			\item For alternatives: Similarity~\cite{choi2010survey} (Normalized Hamming and Jaccard)
 		\end{itemize}
-		\item \emph{Z3}~\cite{bjorner2015nuz, deMoura2008z3} (an SMT solver) as optimizer for solver-based search
 	\end{itemize}
 \end{frame}
 
