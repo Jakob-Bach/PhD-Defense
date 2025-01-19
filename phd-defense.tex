@@ -142,7 +142,7 @@
 			\item Orthogonal to choice of feature-selection method
 			%JB: related work typically integrates one constraint type into one feature-selection method
 			%JB: feature-selection method determines objective, our constraints are independent of objective
-			%JB: solver accepts a broad range of constraints and there are general way to combine solver with objective
+			%JB: solver accepts a broad range of constraints and there are general ways to combine solver with objective
 		\end{itemize}
 	\end{itemize}
 \end{frame}
@@ -167,7 +167,7 @@
 				\item Conduct domain-specific study on impact of constraints
 				%JB: in materials science (will not be discussed in detail); worked with domain experts to formulate constraints
 			\end{itemize}
-			%JB: worked on (C1) and (C2) in parallel (same formalization, but experiments domain- independent vs. specific), joint publication
+			%JB: worked on (C1) and (C2) in parallel (same formalization, but experiments domain-independent vs. -specific), joint publication
 			\pause
 			\item (C3) Using constraints for alternative feature sets \cite{bach2023finding, bach2024alternative}
 			\begin{itemize}
@@ -194,7 +194,7 @@
 				\item Analyze time complexity
 				\item Conduct experimental study
 			\end{itemize}
-			%JB: can see some similarity: formalization, analysis, experiments
+			%JB: can see some similarity to (C3): formalization, analysis, experiments (but different problem tackled)
 			%JB: again, specific constraint types
 			%JB: third publication (with conference and arXiv version)
 			\pause
@@ -204,6 +204,7 @@
 				\item All experimental data available on \href{https://doi.org/10.35097/4kjyeg0z2bxmr6eh}{RADAR4KIT}
 				\item Three GitHub repositories [\href{https://github.com/Jakob-Bach/Constrained-Filter-Feature-Selection}{a}, \href{https://github.com/Jakob-Bach/Alternative-Feature-Selection}{b}, \href{https://github.com/Jakob-Bach/Constrained-Subgroup-Discovery}{c}]
 				\item Three Python packages: \href{https://pypi.org/project/alfese/}{\texttt{alfese}}, \href{https://pypi.org/project/cffs/}{\texttt{cffs}}, \href{https://pypi.org/project/csd/}{\texttt{csd}}
+				%JB: not only scripts for our experiments available, but also core methods reusable for other data scientists
 			\end{itemize}
 		\end{itemize}
 	\end{columns}
@@ -229,7 +230,7 @@
 			%JB: solution counting is expensive, therefore low dimensionality (10-14 features)
 			%JB: 10-fold cross-validation
 			\item Linear objective: $Q(s,X,y) = \sum_{j=1}^{n} q(X_{\cdot{}j},y) \cdot s_j$ (using mutual information~\cite{kraskov2004estimating} as $q(\cdot)$)
-			%JB: very simple notion of feature-set quality (univariate filter)
+			%JB: very simple notion of feature-set quality (univariate filter) (AFS also studies more complex objectives)
 			%JB: absolute Pearson correlation yielded similar insights
 			%JB: also train four prediction models trained with selected features afterwards, but not in presented results: linear regression, regression tree, boosted linear model, boosted trees~\cite{chen2016xgboost, pedregosa2011scikit}
 			\item Generate random constraints for ten constraint types with 1000 repetitions
@@ -242,10 +243,10 @@
 	\pause
 	\vspace{0.5\baselineskip}
 	\begin{examples}[Constraint types]
-		\setlength{\leftmargini}{0.4cm} % box is aligned with slide's itemize, so we need not move items in box a bit to right (setting only applies locally)
+		\setlength{\leftmargini}{0.4cm} % box's border is aligned with slide's itemize, so we need to move items in box a bit to right (setting only applies locally)
 		\begin{itemize}
 			\item $\text{Single-XOR}(s_{j_1}, s_{j_2}) = s_{j_1} \oplus s_{j_2} = (s_{j_1} \land \lnot s_{j_2}) \lor (\lnot s_{j_1} \land s_{j_2})$
-			% JB; some constraints relate to only two features ("single"), some to a group of features ("group"), some to all ("global")
+			% JB; some constraint types relate to only two features ("single"), some to a group of features ("group"), some to all ("global")
 			\item $\text{Group-NAND}(\{s_{j_1}, \dots, s_{j_{n'}}\}) =	\lnot (s_{j_1} \land s_{j_2} \land \dots \land s_{j_{n'}}) = \sum_{l=1}^{n'} s_{j_l} \leq n'-1$
 		\end{itemize}
 	\end{examples}
@@ -258,17 +259,14 @@
 			\centering
 			\includegraphics[width=0.95\textwidth, trim={0 15 0 10}, clip]{plots/syn-selected-vs-objective.pdf}
 			%JB: all experimental results downsampled to 1000 random results to control plot file size
-			%JB: normalization of number of selected features: divide by number of features in dataset
-			%JB: normalization of objective value: divide by summed quality of all features of dataset
 			%JB: clear correlation between number of selected features and objective (is expected)
 		\end{subfigure}
 		\hfill
 		\begin{subfigure}{0.48\textwidth}
 			\centering
 			\includegraphics[width=0.95\textwidth, trim={0 15 0 10}, clip]{plots/syn-solutions-vs-objective.pdf}
-			%JB: normalization of number of solutions: divide by total number of solutions (2 ^{number of features})
 			%JB: clear correlation between size of solution space and objective (this trade-off is expected)
-			%JB: even if solution space narrowed down significantly, high objective possible (the inverse does not hold)
+			%JB: even if solution space narrowed down significantly, high objective possible (the inverse does not hold) -> would be interesting solutions for domain experts
 			%JB: but existence of sweet spots naturally depends on dataset (how feature quality distributed)
 			%JB: huge differences of individual evaluation metrics between constraint types
 			%JB: weaker correlation if not taking size of solution space, but a cheaper proxy like number of constraints or number of constrained features
@@ -277,6 +275,9 @@
 	\end{figure}
 	\centering
 	$\mathit{frac}_{\text{se}} = \frac{\sum_{j=1}^{n} s_j}{n}$ \quad \vline \quad $Q_{\text{norm}} = \frac{\sum_{j=1}^{n} s_j  \cdot q(X_{\cdot{}j},y)}{\sum_{j=1}^{n} q(X_{\cdot{}j},y)}$ \quad \vline \quad $\mathit{frac}_{\text{so}} = \frac{\sum_{s \in \{0,1\}^n} \underset{c \in C}{\min}~c(s)}{2^n}$
+	%JB: normalization of number of selected features: divide by number of features in dataset (we have datasets with different dimensionality)
+	%JB: normalization of objective value: divide by summed quality of all features of dataset (selecting all features)
+	%JB: normalization of number of solutions: divide by total number of solutions (2 ^{number of features})
 \end{frame}
 
 \section{Alternative Feature Selection}
@@ -288,12 +289,12 @@
 	%JB: - insight: Differently composed feature sets can yield similar feature-set quality
 	\begin{itemize}
 		\item Idea: Find feature sets optimizing feature-set quality while differing from each other
-		%JB: using a set dissimilarity measure (in our case: Dice dissimilarity)
 		\begin{itemize}
 			\item Domain-independent constraint type
 			\item Orthogonal to choice of feature-selection method
-			%JB: we discuss integration into various methods
+			%JB: we discuss integration into various (types of) methods
 			\item Number of alternatives~$a \in \mathbb{N}_0$ and feature-set dissimilarity threshold $\tau \in [0,1]$ as user parameters
+			%JB: users need only set parameters, not formulate constraints anymore
 			\item Sequential or simultaneous search
 		\end{itemize}
 	\end{itemize}
@@ -333,7 +334,7 @@
 	\begin{itemize}
 		\item Chosen dissimilarity measure: $d_{\text{Dice}}(F',F'') = 1 - \frac{2 \cdot |F' \cap F''|}{|F'| + |F''|} = 1 - \frac{2 \cdot \sum_{j=1}^n s'_j \cdot s''_j}{\sum_{j=1}^n s'_j + \sum_{j=1}^n s''_j}$
 		%JB: remember that we use binary selection variables "s_j", which form vector "s" for each feature set
-		%JB: for fixed feature-set sizes, resulting constraint becomes linear (in sequential search) or can easily be linearized (in simultaneous search)
+		%JB: for fixed feature-set sizes, denominator constant, so resulting constraint becomes linear (in sequential search) or can easily be linearized (in simultaneous search)
 	\end{itemize}
 \end{frame}
 
@@ -346,19 +347,18 @@
 			%JB: arguably simplest objective, also used in studies (C1) and (C2)
 			\item No feature-set overlap ($\tau = 1$)
 			\item Complete partitioning (each feature part of exactly one feature set)
-			%JB: all features part of exactly one set
 		\end{itemize}
 		\pause
 		\item Proof: Known as \textsc{Multi-Way Number Partitioning}~\cite{korf2010objective} or \textsc{Multiprocessor Scheduling}~\cite{garey2003computers} \qed
 		%JB: if "k" bounded, problem known as "Balanced Number Partitioning" / "K-Partitioning"
-		%JB: NP-hardness naturally transfers to more general problems
+		%JB: NP-hardness naturally transfers from scenario with conditions above to more general scenarios
 		\pause
 		\vspace{\baselineskip}
 		\item Further complexity-related contributions and results:
 		\begin{itemize}
 			\item Prove $\mathcal{NP}$-hardness for (1) incomplete partitioning and (2) feature-set overlap
 			%JB: drop two of the four assumptions above
-			%JB: reduction from base case above (no overlap, complete partitioning)
+			%JB: proof by reduction from base case above (no overlap, complete partitioning)
 			\pause
 			\item Prove polynomial runtime for sum-aggregation and sequential search with remaining conditions from above
 			\pause
@@ -394,7 +394,7 @@
 			%JB: Results from sequential search with \emph{MI} as feature-selection method and $k=10$.
 			%JB: Quality max-normalized per experimental setting, infeasible feature sets assigned a quality of~0.
 		}
-		%JB: here, one of five feature-set quality functions (an univariate objective), ten features to be selected, sequential search only
+		%JB: here, one of five feature-set quality functions (an univariate objective), ten features to be selected, one of five search methods (solver-based sequential)
 		%JB: three evaluation metrics, we take mean over datasets and cross-validation folds
 		%JB: training-set objective value is 1 on 0th alternative due to max normalization (with sequential search run); decreases over number of alternatives, but strong dependency on "tau", which makes sense (if feature sets have to be more dissimilar, less good features left)
 		%JB: similar (but weaker) trend for other two metrics, but need not be 0 at a=0
@@ -406,7 +406,7 @@
 \begin{frame}[t]{(C4) Constrained Subgroup Discovery -- Approach}
 	\begin{itemize}
 		\item Subgroup discovery: ``Identifying descriptions of subsets of a dataset that show an interesting behavior''~\cite{atzmueller2015subgroup}
-		%JB: `Descriptions of subsets': E.g., restrict ranges of numerical features or select particular values of categorical features
+		%JB: `Descriptions of subsets': typically simple, e.g., restrict ranges of numerical features or select particular values of categorical features
 		%JB: unlike typical ML prediction models, need not cover full dataset with one subgroup
 		%JB: Kind of extension to feature selection (one binary decision for each feature; now values play a role)
 		%JB: `Interesting': Based on quality criterion, e.g., (relative) frequency of one particular class label
@@ -448,20 +448,22 @@
 	\vspace{-\baselineskip}
 	%JB: contribution: SMT encoding for problem such that solver-based solution possible
 	%JB: "unconstrained" in sense of no additional constraints apart from ones inherent in problem
+	%JB: forms basis for adding feature-cardinality constraints
 	\begin{align*}
 		\onslide<5->{
 			\max &\quad & Q_{\text{WRAcc}} &= \frac{m_b^+}{m} - \frac{m_b \cdot m^+}{m^2} \tag*{(Objective: subgroup quality)} \\
-			%JB: actually linear
+			%JB: linear since "m" and "m+" constant
 		}
 		\onslide<4->{
 			\text{s.t.:} &\quad & m_b &:= \sum_{i=1}^{m} b_i \quad\text{and}\quad m_b^+ := \sum_{\substack{i \in \{1, \dots, m\} \\ y_i = 1 }} b_i \tag*{(Num of data objects in subgroup)} \\
+			%JB: count b_i
 		}
 		\onslide<3->{
 			&\quad \forall i \in \{1, \dots, m\} & b_i &\leftrightarrow \bigwedge_{j \in \{1, \dots, n\}} \left( \left( X_{ij} \geq \mathit{lb}_j \right) \land \left( X_{ij} \leq \mathit{ub}_j \right) \right) \tag*{(i-th data object in subgroup?)} \\
 		}
 		\onslide<2->{
 			&\quad \forall j \in \{1, \dots, n\} & \mathit{lb}_j &\leq \mathit{ub}_j \tag*{(Constraint: relationship between bounds)} \\
-			%JB: technically, you could even leave constraint out in most situations, as solutions with UB < LB would contain zero data objects in box and therefore have WRAcc = 0, while even a box containing only one positive data object (and nothing else) has a WRAcc > 0; however, if (1) feature values of all positive objects also exist with negative labels (no separation possible) and also there is no option to form an empty box (i.e., all combinations of feature values exist), or (2) there is a lower bound of number of instances covered, then best WRAcc may become < 0
+			%JB: technically, you could even leave constraint out in most situations, as solutions with UB < LB would contain zero data objects in box and therefore have WRAcc = 0, while even a box containing only one positive data object (and nothing else) has a WRAcc > 0; however, if feature values of all positive objects also exist with negative labels (no separation possible) and also there is no option to form an empty box (i.e., all combinations of feature values exist in caetgorical scenario), then best WRAcc may become < 0 (and we want this box instead of an invalid one with WRAcc = 0)
 		}
 		\onslide<3->{
 			&\quad & b &\in \{0, 1\}^m \tag*{(Auxiliary variables: subgroup membership)}  \\
@@ -480,6 +482,7 @@
 		%JB: "k" is a user parameter
 		\item Formally: Limit number of features whose bounds exclude at least one data object from subgroup
 		%JB: i.e., technically, a feature appearing in subgroup description may still not be selected (cannot happen in our implementation because we post-process bounds of subgroups accordingly)
+		%JB: e.g., imagine lower bound at -5 while feature has range [0, 10] -> bound not active
 		\pause
 		\vspace{0.5\baselineskip}
 		\begin{equation*}
@@ -505,7 +508,8 @@
 \end{frame}
 
 \begin{frame}[t]{(C4) Constrained Subgroup Discovery -- Empirical Results}
-	%JB: conduct four different kinds of experiments
+	%JB: conduct four different kinds of experiments (unconstrained, two constraint types, solver timeouts)
+	%JB: compare solver-based approach to five heuristics approaches
 	\begin{figure}
 		\centering
 		\begin{subfigure}[t]{0.32\textwidth}
@@ -526,7 +530,7 @@
 			%JB: 95% confidence intervals based on datasets and cross-validation folds
 			%JB: six SD methods and six feature-cardinality thresholds
 			%JB: heuristics "Beam" and "BI" very close to exact optimum (interesting)
-			%JB: increase of subgroup quality over "k" is small, i.e., small subgroup descriptions already yield high quality
+			%JB: increase of subgroup quality over "k" is small, i.e., small subgroup descriptions already yield high quality (encouraging for interpretability)
 		\end{subfigure}
 		\hfill
 		\pause
@@ -537,7 +541,7 @@
 			%JB: over the number of alternatives, by subgroup-discovery method and dissimilarity threshold~$\tau_{\text{abs}}$
 			%JB: two SD methods, parameters for alternatives varied
 			%JB: alternative subgroup descriptions less (data-object) similar to original the more alternatives desired and the higher (feature-selection) dissimilarity threshold (similar to AFS)
-			%JB: similar trend for subgroup quality
+			%JB: similar trends for subgroup quality
 		\end{subfigure}
 	\end{figure}
 \end{frame}
@@ -597,7 +601,7 @@
 \end{frame}
 
 \begin{frame}[t]{Related Work}
-	%JB: only small selection of related work discussed in dissertation
+	%JB: only small selection of the related work discussed in dissertation
 	\begin{itemize}
 		\item Integrating domain knowledge and constraints:
 		\begin{itemize}
@@ -613,7 +617,7 @@
 			%JB: typical constraint types according to Meeng (2021): LB on quality, LB on members, UB on search depth
 			%JB: studies on feature-cardinality constraint typically limited to one SD method or one cardinality threshold
 			\item Other fields: E.g., AutoML~\cite{neutatz2023automl}, clustering~\cite{dao2024review}, pattern mining~\cite{silva2016constrained}, XAI~\cite{deutch2019constraints}; outside ML: software engineering~\cite{galindo2019automated}
-			%JB: in ML, different problem definitions; software engineering has technically same problem as we (depending on objective function) but different domain/interpretation; technically, they often combine algorithm with sat solving, but pure white-box approach exist as well
+			%JB: in ML, different problem definitions; software engineering has technically same problem as we (depending on objective function) but different domain/interpretation; they often combine algorithm with sat solving, but pure white-box approach exist as well
 		\end{itemize}
 		\vspace{\baselineskip}
 		\item Finding alternative solutions:
@@ -647,7 +651,7 @@
 			\item Soft constraints
 			%JB: may be violated; multi-objective problem, where solutions from Pareto front may be shown to user, or trade-off parameter
 			\item Feature engineering
-			%JB: could develop constraints for feature-creation operators, and/or consider constraint in automated feature engineering
+			%JB: could develop constraints for feature-creation operators, and/or consider constraints in automated feature engineering
 		\end{itemize}
 		\item Applied ML:
 		\begin{itemize}
@@ -657,7 +661,7 @@
 			%JB: we have Python packages (friendly for ML experts), but no interface for end users
 		\end{itemize}
 		\item Complexity theory:
-		%JB: also further work regarding NP-hardness possible, e.g., objectives in AFS and feature-set overlap in ASDD
+		%JB: also further work regarding NP-hardness possible, e.g., other objectives in AFS and feature-set overlap in ASDD
 		\begin{itemize}
 			\item Approximation complexity
 			%JB: rather loose results (APX membership) for one quality function in AFS, no results in SD (though heuristic methods strong there as well)
@@ -799,7 +803,7 @@
 			\item I.e., algorithm for perfect-subgroup discovery also solves \textsc{Set Covering}
 			%JB: however, latter is NP-hard, so former is NP-hard as well (and NP-complete since in NP)
 			\item Finally, optimizing subgroup quality typically at least as hard as finding perfect subgroup
-			%JB: depends on notion of subgroup quality
+			%JB: depends on notion of subgroup quality, but mild condition (perfect subgroup is unique optimum if exists), satisfied for WRAcc
 		\end{itemize}
 	\end{itemize}
 \end{frame}
@@ -813,12 +817,11 @@
 			\item Heuristics (related work): \emph{Beam}, \emph{BI}~\cite{mampaey2012efficient}, \emph{PRIM}~\cite{friedman1999bump}
 			%JB: iteratively and greedily restrict the subgroup's bounds, with one feature per iteration (PRIM: prune fixed fraction of data objects; Beam/BI: test all possible cuts)
 			\item Baselines (novel): \emph{MORS} (Minimal Optimal Recall Subgroup), \emph{Random}
-			%JB: MORS -- minimal bounds such that all positive data objects are in subgroup (exclude as many negative data objects as possible); will play a bigger role in PhD Colloquium on complexity
+			%JB: MORS -- minimal bounds such that all positive data objects are in subgroup (exclude as many negative data objects as possible); intermediate problem between SD and perfect SD
 			%JB: Random -- repeated random sampling of bounds
 		\end{itemize}
 		%JB: hyperparameters fixed for all methods
 		\item Four experimental scenarios: Unconstrained, two constraint types, and solver timeouts
-		%JB: in conference version, only phrased as two scenarios (the two constraint types)
 		\begin{itemize}
 			\item Solver timeouts: \{1~s, 2~s, 4~s, $\dots$, 2048~s\}
 			\item Feature-cardinality constraints: $k \in \{1, 2, 3, 4, 5\}$
