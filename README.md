@@ -8,4 +8,5 @@ at the [Department of Informatics](https://www.informatik.kit.edu/english/index.
 The defense was held on January 20, 2025.
 This repository provides the presentation's LaTeX source code and the final compiled version (with and without animations) as PDF.
 Additionally, the animated version is backed up on [*KITopen*](https://doi.org/10.5445/IR/1000178247).
-The LaTeX source code for the corresponding dissertation is available on [*GitHub*](https://github.com/Jakob-Bach/PhD-Thesis).
+The LaTeX source code for the corresponding dissertation is available on [*GitHub*](https://github.com/Jakob-Bach/PhD-Thesis)
+and the dissertation itself is published on [*KITopen*](https://doi.org/10.5445/IR/1000178649).
